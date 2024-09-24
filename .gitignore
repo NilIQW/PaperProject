@@ -1,0 +1,89 @@
+# Node.js (React) specific files
+node_modules/
+npm-debug.log
+yarn-error.log
+yarn-debug.log
+package-lock.json
+yarn.lock
+
+# Build output
+/dist
+/build
+/.next
+/public/static
+*.log
+
+# Rider specific files
+/.idea/
+/*.suo
+/*.user
+/*.userosscache
+/*.sln.docstates
+
+# JetBrains Rider and IDE-specific files
+/.idea/
+/*.iml
+/.project
+/.classpath
+
+# Environment-specific files
+appsettings.Development.json
+appsettings.Local.json
+.env
+*.local
+
+# System Files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+
+# IDE-specific files
+/.vscode/
+/*.code-workspace
+
+# Database and secrets
+*.sqlite
+*.db
+*.bak
+*.dump
+/.env
+*.pem
+*.key
+*.crt
+*.p12
+
+# Log and debug files
+*.log
+*.tmp
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# macOS Finder files
+.DS_Store
+
+# Windows image file caches
+Thumbs.db
+
+# Windows desktop ini
+Desktop.ini
+
+# Exclude Git folders
+/.git/
+
+# Exclude Docker related files (optional)
+*.dockerignore
+*.dockerfile
+
+# Ignore all files from the front-end and back-end projects
+/PaperAPI/bin/
+/PaperAPI/obj/
+/PaperAPI/Properties/
+/ecommerce-site/build/
+/ecommerce-site/.env
+/ecommerce-site/node_modules/
