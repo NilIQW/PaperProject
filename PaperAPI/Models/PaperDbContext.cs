@@ -9,15 +9,12 @@ public partial class PaperDbContext : DbContext
     
     private readonly IConfiguration _configuration;
 
-    public PaperDbContext(IConfiguration configuration)
-    {
-        _configuration = configuration;
-    }
-
-    public PaperDbContext(DbContextOptions<PaperDbContext> options)
+    public PaperDbContext(DbContextOptions<PaperDbContext> options, IConfiguration configuration)
         : base(options)
     {
+        _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
     }
+
 
     public virtual DbSet<Customer> Customers { get; set; }
 
