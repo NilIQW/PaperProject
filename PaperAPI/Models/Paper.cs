@@ -26,6 +26,13 @@ public partial class Paper
 
     [Column("price")]
     public double Price { get; set; }
+    
+    [Column("imageurl")]
+    public string ImageUrl { get; set; }
+    
+    [Column("sheetsperpacket")]
+    
+    public int SheetsPerPacket { get; set; }
 
     [InverseProperty("Product")]
     public virtual ICollection<OrderEntry> OrderEntries { get; set; } = new List<OrderEntry>();

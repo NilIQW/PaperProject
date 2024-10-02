@@ -21,6 +21,7 @@ builder.Services.AddDbContext<PaperDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<IRepository<Customer>, CustomerRepository>();
+builder.Services.AddScoped<IRepository<Paper>, PaperRepository>();
 
 
 

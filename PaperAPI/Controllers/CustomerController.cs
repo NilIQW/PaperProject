@@ -24,7 +24,7 @@ namespace PaperAPI.Controllers
             var customers = await _customerRepository.GetAllAsync();
 
             // Manual mapping of Customer entities to CustomerDto
-            var customerDto = customers.Select(c => new CustomerDTO
+            var customerDto =  customers.Select(c => new CustomerDTO
             {
                 Id = c.Id,
                 Name = c.Name,

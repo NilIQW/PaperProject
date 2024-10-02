@@ -4,4 +4,7 @@ export interface Paper {
     discontinued: boolean;
     stock: number;
     price: number;
+    quantity: number;
+    imageUrl: string;
+    sheetsPerPacket: number;
 }

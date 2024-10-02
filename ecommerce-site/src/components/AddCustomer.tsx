@@ -1,4 +1,3 @@
-// src/components/AddCustomer.js
 import React, { useState } from 'react';
 import { addCustomer } from '../services/customerService';
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import CustomerList from './components/CustomerList';
+import CustomerList from '../src/components/CustomerList.tsx';
 import AddCustomer from './components/AddCustomer';
 
 const App = () => {
