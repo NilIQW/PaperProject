@@ -7,11 +7,15 @@ using Xunit;
 using PaperAPI.Models;
 using PaperAPI.Repositories;
 using Microsoft.Extensions.Configuration;
+using PgCtx;
 
 namespace PaperApi.Tests.Repositories
 {
     public class PaperRepositoryTests
     {
+        
+        public PgCtxSetup<PaperDbContext> setup = new();
+
         private readonly DbContextOptions<PaperDbContext> _options;
         private readonly IConfiguration _configuration;
 
@@ -35,7 +39,7 @@ namespace PaperApi.Tests.Repositories
         public async Task AddAsync_ShouldAddPaper()
         {
             // Arrange
-            await using var context = new PaperDbContext(_options, _configuration);
+            await using var context = setup.DbContextInstance;
             var repository = new PaperRepository(context);
             var paper = new Paper { Name = "A4 Paper", Price = 10.00, Stock = 100 };
 
@@ -52,7 +56,7 @@ namespace PaperApi.Tests.Repositories
         public async Task GetAllAsync_ShouldReturnAllPapers()
         {
             // Arrange
-            await using var context = new PaperDbContext(_options, _configuration);
+            await using var context = setup.DbContextInstance;
             var repository = new PaperRepository(context);
             await repository.AddAsync(new Paper { Name = "A4 Paper" });
             await repository.AddAsync(new Paper { Name = "A3 Paper" });

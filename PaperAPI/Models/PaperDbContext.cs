@@ -9,10 +9,11 @@ public partial class PaperDbContext : DbContext
     
     private readonly IConfiguration _configuration;
 
-    public PaperDbContext(DbContextOptions<PaperDbContext> options, IConfiguration configuration)
+    public PaperDbContext(DbContextOptions<PaperDbContext> options//, IConfiguration configuration
+    )
         : base(options)
     {
-        _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+       // _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
     }
 
 
@@ -26,8 +27,7 @@ public partial class PaperDbContext : DbContext
 
     public virtual DbSet<Property> Properties { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseNpgsql(_configuration.GetConnectionString("DefaultConnection"));
+    //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) => optionsBuilder.UseNpgsql(_configuration.GetConnectionString("DefaultConnection"));
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
