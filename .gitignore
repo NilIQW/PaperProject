@@ -69,6 +69,8 @@ jspm_packages/
 
 # Windows image file caches
 Thumbs.db
+bin
+obj
 
 # Windows desktop ini
 Desktop.ini
