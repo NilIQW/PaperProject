@@ -2,9 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
-
-namespace PaperAPI.Models;
 
 [Table("properties")]
 public partial class Property
@@ -17,7 +14,6 @@ public partial class Property
     [StringLength(255)]
     public string PropertyName { get; set; } = null!;
 
-    [ForeignKey("PropertyId")]
-    [InverseProperty("Properties")]
-    public virtual ICollection<Paper> Papers { get; set; } = new List<Paper>();
+    [InverseProperty("Property")]
+    public virtual ICollection<PaperProperty> PaperProperties { get; set; } = new List<PaperProperty>();
 }

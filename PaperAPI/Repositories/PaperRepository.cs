@@ -14,13 +14,21 @@ public class PaperRepository : IRepository<Paper>
 
     public async Task<IEnumerable<Paper>> GetAllAsync()
     {
-        return await _context.Papers.ToListAsync();
+        // Updated to include PaperProperties and the related Property
+        return await _context.Papers
+            .Include(p => p.PaperProperties) // Include the linking entity
+            .ThenInclude(pp => pp.Property) // Include the related Property
+            .ToListAsync();
     }
 
     public async Task<Paper> GetByIdAsync(int id)
     {
-        return await _context.Papers.FindAsync(id);
+        return await _context.Papers
+            .Include(p => p.PaperProperties) // Include PaperProperties for the single paper
+            .ThenInclude(pp => pp.Property) // Include the related Property
+            .FirstOrDefaultAsync(p => p.Id == id);
     }
+
 
     public async Task AddAsync(Paper paper)
     {

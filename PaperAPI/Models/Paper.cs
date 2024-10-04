@@ -2,12 +2,9 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
-
-namespace PaperAPI.Models;
+using PaperAPI.Models;
 
 [Table("paper")]
-[Index("Name", Name = "unique_product_name", IsUnique = true)]
 public partial class Paper
 {
     [Key]
@@ -26,18 +23,17 @@ public partial class Paper
 
     [Column("price")]
     public double Price { get; set; }
-    
-    [Column("imageurl")]
-    public string ImageUrl { get; set; }
-    
+
     [Column("sheetsperpacket")]
-    
     public int SheetsPerPacket { get; set; }
+
+    [Column("imageurl")]
+    [StringLength(255)]
+    public string? ImageUrl { get; set; }
 
     [InverseProperty("Product")]
     public virtual ICollection<OrderEntry> OrderEntries { get; set; } = new List<OrderEntry>();
 
-    [ForeignKey("PaperId")]
-    [InverseProperty("Papers")]
-    public virtual ICollection<Property> Properties { get; set; } = new List<Property>();
+    [InverseProperty("Paper")]
+    public virtual ICollection<PaperProperty> PaperProperties { get; set; } = new List<PaperProperty>();
 }

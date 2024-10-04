@@ -1,39 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace PaperAPI.Models;
 
 public partial class PaperDbContext : DbContext
 {
-    
-    private readonly IConfiguration _configuration;
-
-    public PaperDbContext(DbContextOptions<PaperDbContext> options//, IConfiguration configuration
-    )
-        : base(options)
-    {
-       // _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
-    }
-
+    public PaperDbContext(DbContextOptions<PaperDbContext> options) : base(options) { }
 
     public virtual DbSet<Customer> Customers { get; set; }
-
     public virtual DbSet<Order> Orders { get; set; }
-
     public virtual DbSet<OrderEntry> OrderEntries { get; set; }
-
     public virtual DbSet<Paper> Papers { get; set; }
-
     public virtual DbSet<Property> Properties { get; set; }
-
-    //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) => optionsBuilder.UseNpgsql(_configuration.GetConnectionString("DefaultConnection"));
+    public virtual DbSet<PaperProperty> PaperProperties { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Customer>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("customers_pkey");
+        });
+
+        modelBuilder.Entity<Paper>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("paper_pkey");
+        });
+
+        modelBuilder.Entity<Property>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("properties_pkey");
         });
 
         modelBuilder.Entity<Order>(entity =>
@@ -52,46 +46,30 @@ public partial class PaperDbContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("order_entries_pkey");
 
-            entity.HasOne(d => d.Order).WithMany(p => p.OrderEntries).HasConstraintName("order_entries_order_id_fkey");
+            entity.HasOne(d => d.Order)
+                .WithMany(p => p.OrderEntries)
+                .HasConstraintName("order_entries_order_id_fkey");
 
-            entity.HasOne(d => d.Product).WithMany(p => p.OrderEntries).HasConstraintName("order_entries_product_id_fkey");
+            entity.HasOne(d => d.Product)
+                .WithMany(p => p.OrderEntries)
+                .HasConstraintName("order_entries_product_id_fkey");
         });
 
-        modelBuilder.Entity<Paper>(entity =>
+        modelBuilder.Entity<PaperProperty>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("paper_pkey");
+            entity.HasKey(e => new { e.PaperId, e.PropertyId }).HasName("paper_properties_pkey");
 
-            entity.Property(e => e.Discontinued).HasDefaultValue(false);
-            entity.Property(e => e.Stock).HasDefaultValue(0);
+            entity.HasOne(d => d.Paper)
+                .WithMany(p => p.PaperProperties)
+                .HasForeignKey(d => d.PaperId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("paper_properties_paper_id_fkey");
 
-            entity.HasMany(d => d.Properties).WithMany(p => p.Papers)
-                .UsingEntity<Dictionary<string, object>>(
-                    "PaperProperty",
-                    r => r.HasOne<Property>().WithMany()
-                        .HasForeignKey("PropertyId")
-                        .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("paper_properties_property_id_fkey"),
-                    l => l.HasOne<Paper>().WithMany()
-                        .HasForeignKey("PaperId")
-                        .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("paper_properties_paper_id_fkey"),
-                    j =>
-                    {
-                        j.HasKey("PaperId", "PropertyId").HasName("paper_properties_pkey");
-                        j.ToTable("paper_properties");
-                        j.HasIndex(new[] { "PropertyId" }, "IX_paper_properties_property_id");
-                        j.IndexerProperty<int>("PaperId").HasColumnName("paper_id");
-                        j.IndexerProperty<int>("PropertyId").HasColumnName("property_id");
-                    });
+            entity.HasOne(d => d.Property)
+                .WithMany(p => p.PaperProperties)
+                .HasForeignKey(d => d.PropertyId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("paper_properties_property_id_fkey");
         });
-
-        modelBuilder.Entity<Property>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("properties_pkey");
-        });
-
-        OnModelCreatingPartial(modelBuilder);
     }
-
-    partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 }

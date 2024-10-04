@@ -1,8 +1,8 @@
-
 import React, { useEffect, useState } from 'react';
 import { getPapers } from '../services/paperService';
 import { Paper } from '../models/Paper.tsx';
-import AddToBasketButton from "./AddToBasketButton.tsx";
+import AddToBasketButton from './AddToBasketButton.tsx';
+import { Link } from 'react-router-dom';  // Import Link from react-router-dom
 
 const BrowseProducts: React.FC = () => {
     const [papers, setPapers] = useState<Paper[]>([]);
@@ -33,6 +33,22 @@ const BrowseProducts: React.FC = () => {
                 margin: '30px',
                 marginLeft: 'auto',
             }}>Browse Products</h2>
+
+            {/* Button to navigate to create new paper page */}
+            <Link to="/create-paper">
+                <button style={{
+                    marginBottom: '20px',
+                    padding: '10px 20px',
+                    backgroundColor: '#4CAF50',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '5px',
+                    cursor: 'pointer'
+                }}>
+                    Create New Paper
+                </button>
+            </Link>
+
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '70px' }}>
                 {papers.map((paper) => (
                     <div
@@ -62,10 +78,26 @@ const BrowseProducts: React.FC = () => {
                         <p style={{fontSize: '1em'}}>Sheets Per Packet: {paper.sheetsPerPacket}</p>
 
                         <AddToBasketButton paper={paper}/>
+
+                        {/* Button to navigate to edit paper page */}
+                        <Link to={`/edit-paper/${paper.id}`}>
+                            <button style={{
+                                marginTop: '10px',
+                                padding: '10px 20px',
+                                backgroundColor: '#008CBA',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '5px',
+                                cursor: 'pointer'
+                            }}>
+                                Edit Paper
+                            </button>
+                        </Link>
                     </div>
                 ))}
             </div>
         </div>
     );
 };
+
 export default BrowseProducts;

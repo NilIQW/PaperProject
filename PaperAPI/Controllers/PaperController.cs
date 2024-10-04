@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using PaperAPI.DTOs.PaperDTO;
+using PaperAPI.DTOs.PropertyDTO;
 using PaperAPI.Models;
 using PaperAPI.Repositories;
 
@@ -20,21 +21,36 @@ namespace PaperAPI.Controllers
     [HttpGet]
     public async Task<ActionResult<IEnumerable<PaperDTO>>> GetPaper()
     {
-        var allPapers = await _paperRepository.GetAllAsync();
-
-        var paperDto = allPapers.Select(p => new PaperDTO
+        try
         {
-            Id = p.Id,
-            Name = p.Name,
-            Discontinued = p.Discontinued,
-            Stock = p.Stock,
-            Price = p.Price,
-            ImageUrl = p.ImageUrl,
-            SheetsPerPacket = p.SheetsPerPacket,
-        }).ToList();
-        
-        return Ok(paperDto);
+            var allPapers = await _paperRepository.GetAllAsync();
+            var paperDto = allPapers.Select(p => new PaperDTO
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Discontinued = p.Discontinued,
+                Stock = p.Stock,
+                Price = p.Price,
+                ImageUrl = p.ImageUrl,
+                SheetsPerPacket = p.SheetsPerPacket,
+
+                // Updated this line to access PaperProperties instead of Properties
+                Properties = p.PaperProperties.Select(pp => new PropertyDTO
+                {
+                    Id = pp.Property.Id, // Accessing the related Property's Id
+                    PropertyName = pp.Property.PropertyName, // Accessing the related Property's name
+                }).ToList()
+            }).ToList();
+
+            return Ok(paperDto);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, "Internal server error");
+        }
     }
+
+
 
     [HttpGet("{id}")]
     public async Task<ActionResult<PaperDTO>> GetPaperById(int id)

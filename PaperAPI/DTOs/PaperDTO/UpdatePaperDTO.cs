@@ -9,5 +9,7 @@ public class UpdatePaperDTO
     public string? ImageUrl { get; set; }
     
     public int? SheetsPerPacket { get; set; }
+    
+    public List<PropertyDTO.PropertyDTO> Properties { get; set; } = new List<PropertyDTO.PropertyDTO>();
 
 }
