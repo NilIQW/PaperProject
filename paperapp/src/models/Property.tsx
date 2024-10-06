@@ -1,11 +1,7 @@
+// src/models/Property.tsx
 export interface Property {
-    id: number;
-    name: string;
-    value: string;
+    id?: number;
+    name?: string;
 }
 
-export interface PaperProperty {
-    paperId: number;
-    propertyId: number;
-    property: Property;
-}
+

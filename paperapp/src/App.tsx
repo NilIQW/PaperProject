@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import BrowseProducts from './components/BrowseProducts';
 import BasketPage from './components/BasketPage';
 import BasketIcon from "./components/BasketIcon.tsx";
-import PaperCrudPage from "./components/PaperCrudPage.tsx";
+import CreatePaper from "./components/CreatePaper.tsx";
 
 const App: React.FC = () => {
     return (
@@ -13,7 +13,7 @@ const App: React.FC = () => {
                 <Routes>
                     <Route path="/" element={<BrowseProducts />} />
                     <Route path="/basket" element={<BasketPage />} />
-                    <Route path="/paper-management" element={<PaperCrudPage />} />
+                    <Route path="/create-paper" element={<CreatePaper />} />
                 </Routes>
             </div>
         </Router>

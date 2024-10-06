@@ -11,5 +11,3 @@ export const paperAtom = atom<Paper>({
     imageUrl: '',
     discontinued: false
 });
-
-export const customPropertiesAtom = atom<{ key: string, value: string }[]>([]);

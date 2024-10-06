@@ -3,7 +3,7 @@ using PaperAPI.Models;
 
 namespace PaperAPI.Repositories;
 
-public class PropertyRepository : IRepository<Property>
+public class PropertyRepository : IPropertyRepository
 {
     private readonly PaperDbContext _context;
 
@@ -43,4 +43,9 @@ public class PropertyRepository : IRepository<Property>
             await _context.SaveChangesAsync();
         }
     }
+    public async Task<Property> GetByNameAsync(string propertyName)
+    {
+        return await _context.Properties.FirstOrDefaultAsync(p => p.PropertyName == propertyName);
+    }
+
 }

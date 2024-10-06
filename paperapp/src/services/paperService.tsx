@@ -23,22 +23,25 @@ export const getPaperById = async (id: number): Promise<Paper> => {
     return await response.json();
 };
 
-// Create a new paper
-export const createPaper = async (paper: Paper): Promise<Paper> => {
+export const createPaper = async (paperData: any) => {
     const response = await fetch(API_URL, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(paper),
+        body: JSON.stringify(paperData),
     });
 
     if (!response.ok) {
-        throw new Error('Failed to create paper');
+        const errorText = await response.text();
+        console.error("Error creating paper:", errorText);
+        throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
     }
 
-    return await response.json();
+    const createdPaper = await response.json();
+    return createdPaper;
 };
+
 
 // Update an existing paper
 export const updatePaper = async (id: number, paper: Paper): Promise<Paper> => {

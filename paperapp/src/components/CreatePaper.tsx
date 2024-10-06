@@ -1,58 +1,48 @@
-import React, { useEffect } from 'react';
-import {atom, useAtom} from 'jotai';
-import { paperAtom, customPropertiesAtom } from '../state/atoms/paperAtom';
-import { createPaper, updatePaper, getPaperById } from '../services/paperService';
-import { useParams, useNavigate } from 'react-router-dom';
+import React from 'react';
+import { useAtom } from 'jotai';
+import { paperAtom } from '../state/atoms/paperAtom';
+import { createPaper } from '../services/paperService';
+import { useNavigate } from 'react-router-dom';
+import { customPropertiesAtom } from '../state/atoms/CustomPropertiesAtom';
+import { Property } from '../models/Property';
 
-const PaperCrudPage: React.FC = () => {
-    const { paperId } = useParams<{ paperId: string }>(); // For edit mode
-    const navigate = useNavigate();
-
+const CreatePaper: React.FC = () => {
     const [paper, setPaper] = useAtom(paperAtom);
     const [customProperties, setCustomProperties] = useAtom(customPropertiesAtom);
-    const [loading, setLoading] = useAtom(atom(false));
-    const [error, setError] = useAtom(atom<string | null>(null));
+    const navigate = useNavigate();
 
-    // Fetch existing paper if editing
-    useEffect(() => {
-        if (paperId) {
-            const fetchPaper = async () => {
-                try {
-                    const fetchedPaper = await getPaperById(parseInt(paperId));
-                    setPaper(fetchedPaper);
-                } catch (err) {
-                    setError('Error fetching paper details');
-                }
-            };
-            fetchPaper();
-        }
-    }, [paperId, setPaper, setError]);
-
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleCreate = async (e: React.FormEvent) => {
         e.preventDefault();
-        setLoading(true);
+
         try {
-            if (paperId) {
-                await updatePaper(parseInt(paperId), paper);
-            } else {
-                await createPaper(paper);
-            }
-            navigate('/'); // Redirect to main page after save
+            const response = await createPaper({
+                name: paper.name,
+                discontinued: paper.discontinued,
+                stock: paper.stock,
+                price: paper.price,
+                imageUrl: paper.imageUrl,
+                sheetsPerPacket: paper.sheetsPerPacket,
+                properties: customProperties.map(prop => ({
+                    propertyName: prop.name,
+                })),
+            });
+
+            navigate('/');
         } catch (err) {
-            setError('Error saving paper');
-        } finally {
-            setLoading(false);
+            console.error('Error creating paper:', err);
         }
     };
 
-    const handlePropertyChange = (index: number, key: string, value: string) => {
+
+    const handlePropertyChange = (index: number, value: string) => {
         const newProperties = [...customProperties];
-        newProperties[index] = { ...newProperties[index], [key]: value };
+        newProperties[index] = { ...newProperties[index], name: value };
         setCustomProperties(newProperties);
     };
 
     const addCustomProperty = () => {
-        setCustomProperties([...customProperties, { key: '', value: '' }]);
+        const newProperty: Property = { id: Date.now(), name: '' };
+        setCustomProperties([...customProperties, newProperty]);
     };
 
     const removeCustomProperty = (index: number) => {
@@ -60,13 +50,10 @@ const PaperCrudPage: React.FC = () => {
         setCustomProperties(newProperties);
     };
 
-    if (loading) return <div>Loading...</div>;
-    if (error) return <div>Error: {error}</div>;
-
     return (
         <div>
-            <h2>{paperId ? 'Edit Paper' : 'Create New Paper'}</h2>
-            <form onSubmit={handleSubmit}>
+            <h2>Create New Paper</h2>
+            <form onSubmit={handleCreate}>
                 <label>
                     Name:
                     <input
@@ -106,26 +93,15 @@ const PaperCrudPage: React.FC = () => {
                     />
                 </label>
                 <br />
-
-                {/* Custom Properties Section */}
                 <h3>Custom Properties</h3>
                 {customProperties.map((property, index) => (
                     <div key={index}>
                         <label>
-                            Key:
+                            Name
                             <input
                                 type="text"
-                                value={property.key}
-                                onChange={(e) => handlePropertyChange(index, 'key', e.target.value)}
-                                required
-                            />
-                        </label>
-                        <label>
-                            Value:
-                            <input
-                                type="text"
-                                value={property.value}
-                                onChange={(e) => handlePropertyChange(index, 'value', e.target.value)}
+                                value={property.name}
+                                onChange={(e) => handlePropertyChange(index, e.target.value)}
                                 required
                             />
                         </label>
@@ -133,12 +109,11 @@ const PaperCrudPage: React.FC = () => {
                     </div>
                 ))}
                 <button type="button" onClick={addCustomProperty}>Add Custom Property</button>
-
                 <br />
-                <button type="submit">{paperId ? 'Update Paper' : 'Create Paper'}</button>
+                <button type="submit">Create Paper</button>
             </form>
         </div>
     );
 };
 
-export default PaperCrudPage;
+export default CreatePaper;
