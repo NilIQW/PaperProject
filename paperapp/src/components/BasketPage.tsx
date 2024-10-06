@@ -2,7 +2,7 @@ import React from 'react';
 import { useAtom } from 'jotai';
 import { basketAtom, basketTotalPriceAtom } from '../state/atoms/basketAtom';
 import { Paper } from '../models/Paper';
-import {useNavigate} from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const BasketPage: React.FC = () => {
     const [basket] = useAtom(basketAtom);
@@ -10,7 +10,16 @@ const BasketPage: React.FC = () => {
     const navigate = useNavigate();
 
     const handleOrder = () => {
-        navigate('/customer-info'); // Navigate to customer info page
+        const orderDetails = {
+            totalPrice,
+            items: basket.map(item => ({
+                productId: item.id,
+                quantity: item.quantity,
+                productName: item.name,
+            })),
+        };
+
+        navigate('/customer-info', { state: orderDetails }); 
     };
 
     return (

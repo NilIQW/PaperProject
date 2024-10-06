@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 using PaperAPI.Models;
 using PaperAPI.Repositories;
@@ -25,11 +26,20 @@ public class Program // Explicitly declare this class as public
 
         builder.Services.AddScoped<IRepository<Customer>, CustomerRepository>();
         builder.Services.AddScoped<IRepository<Paper>, PaperRepository>();
+        builder.Services.AddScoped<IRepository<Order>, OrderRepository>();
         builder.Services.AddScoped<PaperPropertyRepository>();
         builder.Services.AddScoped<IPropertyRepository, PropertyRepository>(); 
+        builder.Services.AddScoped<IRepository<OrderEntry>, OrderEntryRepository>();
 
+        
+        builder.Services.AddControllers()
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+            });
 
         builder.Services.AddControllers(); 
+        
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
 

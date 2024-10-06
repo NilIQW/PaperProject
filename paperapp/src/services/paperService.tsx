@@ -44,17 +44,19 @@ export const createPaper = async (paperData: any) => {
 
 
 // Update an existing paper
-export const updatePaper = async (id: number, paper: Paper): Promise<Paper> => {
+export const updatePaper = async (id: number, paperData: any): Promise<Paper> => {
     const response = await fetch(`${API_URL}/${id}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(paper),
+        body: JSON.stringify(paperData),
     });
 
     if (!response.ok) {
-        throw new Error(`Failed to update paper with id ${id}`);
+        const errorText = await response.text();
+        console.error("Error updating paper:", errorText);
+        throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
     }
 
     return await response.json();
