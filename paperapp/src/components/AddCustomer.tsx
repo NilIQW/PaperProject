@@ -1,39 +1,57 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { addCustomer } from '../services/customerService';
-import {Customer} from "../models/Customer.tsx";
-import {useAtom} from "jotai";
-import {customerAtom} from "../state/atoms/customerAtom.tsx";
+import { createOrder } from '../services/orderService';
+import { useAtom } from 'jotai';
+import { nameAtom, emailAtom, phoneAtom, addressAtom } from '../state/atoms/customerAtom';
+import { basketAtom, basketTotalPriceAtom } from '../state/atoms/basketAtom';
+import { Customer } from '../models/Customer';
+import {Order} from "../models/Order.tsx"; // Adjust the path as needed
 
-
-interface AddCustomerProps {
-    onCustomerAdded?: (customer: Customer) => void;
-}
-
-
-
-const AddCustomer: React.FC<AddCustomerProps> = () => {
-    const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
-    const [phone, setPhone] = useState('');
-    const [address, setAddress] = useState('');
-
-    const [customer, setCustomer] = useAtom(customerAtom);
-
+const AddCustomer: React.FC = () => {
+    const [name, setName] = useAtom(nameAtom);
+    const [email, setEmail] = useAtom(emailAtom);
+    const [phone, setPhone] = useAtom(phoneAtom);
+    const [address, setAddress] = useAtom(addressAtom);
+    const [basket] = useAtom(basketAtom);
+    const [totalPrice] = useAtom(basketTotalPriceAtom);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         const newCustomer: Customer = { name, email, phone, address };
+
         try {
             const addedCustomer = await addCustomer(newCustomer);
-            setCustomer([...customer, addedCustomer]);
+
+            // Ensure customerId is defined
+            if (!addedCustomer.id) {
+                throw new Error("Customer ID is undefined after creation.");
+            }
+
+            // Prepare order details
+            const orderDetails: Order = {
+                totalAmount: totalPrice,
+                customerId: addedCustomer.id, // Now guaranteed to be a number
+                orderEntries: basket.map(item => ({
+                    productId: item.id,
+                    quantity: item.quantity ?? 0, // Ensure quantity is defined; default to 0 if undefined
+                })),
+            };
+
+            console.log('Order Details:', orderDetails); // Log order details
+
+            // Create the order
+            await createOrder(orderDetails);
+
+            // Reset the fields
             setName('');
             setEmail('');
             setPhone('');
             setAddress('');
         } catch (error) {
-            console.error(error);
+            console.error('Error in handleSubmit:', error); // Log the error with context
         }
     };
+
 
     return (
         <form onSubmit={handleSubmit} style={styles.form}>

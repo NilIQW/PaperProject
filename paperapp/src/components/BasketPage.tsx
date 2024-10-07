@@ -11,15 +11,16 @@ const BasketPage: React.FC = () => {
 
     const handleOrder = () => {
         const orderDetails = {
-            totalPrice,
-            items: basket.map(item => ({
+            totalAmount: totalPrice,
+            customerId: 5, // Update to use the actual customer ID when available
+            orderEntries: basket.map(item => ({
                 productId: item.id,
                 quantity: item.quantity,
-                productName: item.name,
             })),
         };
 
-        navigate('/customer-info', { state: orderDetails }); 
+        // Navigate to customer info or directly save the order
+        navigate('/customer-info', { state: orderDetails });
     };
 
     return (
