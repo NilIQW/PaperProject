@@ -5,7 +5,7 @@ using PaperAPI.Models;
 
 namespace PaperAPI.Repositories;
 
-public class OrderRepository : IRepository<Order>
+public class OrderRepository : IOrderRepository
 {
     private readonly PaperDbContext _context;
 
@@ -49,4 +49,14 @@ public class OrderRepository : IRepository<Order>
             await _context.SaveChangesAsync();
         }
     }
+    
+    public async Task<Order> GetOrderWithDetailsAsync(int id)
+    {
+        return await _context.Orders
+            .Include(o => o.Customer)               // Load the customer information
+            .Include(o => o.OrderEntries)           // Load the order entries
+            .ThenInclude(oe => oe.Product)          // Load the product for each order entry
+            .FirstOrDefaultAsync(o => o.Id == id);
+    }
+
 }

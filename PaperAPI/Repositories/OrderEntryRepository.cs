@@ -19,6 +19,7 @@ public class OrderEntryRepository : IRepository<OrderEntry>
             .Include(oe => oe.Order)
             .ToListAsync();
     }
+    
 
     public async Task<OrderEntry> GetByIdAsync(int id)
     {

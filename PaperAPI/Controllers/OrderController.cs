@@ -9,15 +9,29 @@ namespace PaperAPI.Controllers;
 [Route("api/[controller]")]
 public class OrdersController : ControllerBase
 {
-    private readonly IRepository<Order> _orderRepository;
+    private readonly IOrderRepository _orderRepository;
     private readonly IRepository<OrderEntry> _orderEntryRepository;
 
-    public OrdersController(IRepository<Order> orderRepository, IRepository<OrderEntry> orderEntryRepository)
+    public OrdersController(IOrderRepository orderRepository, IRepository<OrderEntry> orderEntryRepository)
     {
         _orderRepository = orderRepository;
         _orderEntryRepository = orderEntryRepository;
     }
 
+    [HttpGet("{id}")]
+    public async Task<ActionResult<Order>> GetOrder(int id)
+    {
+        var order = await _orderRepository.GetOrderWithDetailsAsync(id);
+
+        if (order == null)
+        {
+            return NotFound();
+        }
+
+        return order;
+    }
+    
+    
     [HttpPost]
     public async Task<ActionResult<Order>> CreateOrder(CreateOrderDTO createOrderDto)
     {
@@ -66,4 +80,6 @@ public class OrdersController : ControllerBase
             return StatusCode(500, $"Internal server error: {ex.Message}");
         }
     }
+    
+    
 }

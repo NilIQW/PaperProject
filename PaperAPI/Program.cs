@@ -26,7 +26,7 @@ public class Program // Explicitly declare this class as public
 
         builder.Services.AddScoped<IRepository<Customer>, CustomerRepository>();
         builder.Services.AddScoped<IRepository<Paper>, PaperRepository>();
-        builder.Services.AddScoped<IRepository<Order>, OrderRepository>();
+        builder.Services.AddScoped<IOrderRepository, OrderRepository>();
         builder.Services.AddScoped<PaperPropertyRepository>();
         builder.Services.AddScoped<IPropertyRepository, PropertyRepository>(); 
         builder.Services.AddScoped<IRepository<OrderEntry>, OrderEntryRepository>();

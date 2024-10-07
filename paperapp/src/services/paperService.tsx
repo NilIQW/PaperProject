@@ -1,6 +1,6 @@
 import { Paper } from '../models/Paper.tsx';
 
-const API_URL = "http://localhost:5074/api/paper";
+const API_URL = "http://localhost:5074/api/Paper";
 
 // Fetch all papers
 export const getPapers = async (): Promise<Paper[]> => {
