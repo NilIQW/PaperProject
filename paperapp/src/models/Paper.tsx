@@ -1,4 +1,5 @@
-import {Property} from "./Property.tsx";
+import { OrderEntry } from './OrderEntry';
+import { PaperProperty } from './PaperProperty';
 
 export interface Paper {
     id: number;
@@ -6,9 +7,8 @@ export interface Paper {
     discontinued: boolean;
     stock: number;
     price: number;
-    quantity?: number;
-    imageUrl: string;
     sheetsPerPacket: number;
-    customProperties?: Property[];
-
+    imageUrl?: string;
+    orderEntries: OrderEntry[];
+    paperProperties: PaperProperty[];
 }

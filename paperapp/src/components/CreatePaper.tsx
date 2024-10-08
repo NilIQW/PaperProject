@@ -21,11 +21,11 @@ const CreatePaper: React.FC = () => {
                 discontinued: paper.discontinued,
                 stock: paper.stock,
                 price: paper.price,
-                imageUrl: imageFile ? URL.createObjectURL(imageFile) : paper.imageUrl, // Set imageUrl based on file input
+                imageUrl: imageFile ? URL.createObjectURL(imageFile) : paper.imageUrl,
                 sheetsPerPacket: paper.sheetsPerPacket,
-                properties: customProperties.map(prop => ({
-                    propertyName: prop.name,
-                })),
+                paperProperties: customProperties.map((prop) => ({
+                    propertyName: prop.propertyName,
+                })), // Mapping the custom properties correctly
             });
 
             navigate('/');
@@ -36,12 +36,12 @@ const CreatePaper: React.FC = () => {
 
     const handlePropertyChange = (index: number, value: string) => {
         const newProperties = [...customProperties];
-        newProperties[index] = { ...newProperties[index], name: value };
+        newProperties[index] = { ...newProperties[index], propertyName: value };
         setCustomProperties(newProperties);
     };
 
     const addCustomProperty = () => {
-        const newProperty: Property = { id: Date.now(), name: '' };
+        const newProperty: Property = { id: Date.now(), propertyName: '' };
         setCustomProperties([...customProperties, newProperty]);
     };
 
@@ -54,7 +54,7 @@ const CreatePaper: React.FC = () => {
         const file = e.target.files?.[0];
         if (file) {
             setImageFile(file);
-            setPaper({ ...paper, imageUrl: URL.createObjectURL(file) }); // Optional: Display the image preview
+            setPaper({ ...paper, imageUrl: URL.createObjectURL(file) }); // Optional image preview
         }
     };
 
@@ -128,23 +128,39 @@ const CreatePaper: React.FC = () => {
                 <br />
                 <h3>Custom Properties</h3>
                 {customProperties.map((property, index) => (
-                    <div key={index}>
+                    <div key={property.id}>
                         <label>
-                            Name
+                            Name:
                             <input
                                 type="text"
-                                value={property.name}
+                                value={property.propertyName}
                                 onChange={(e) => handlePropertyChange(index, e.target.value)}
                                 required
                                 style={{ width: '100%', padding: '8px', marginBottom: '10px', borderRadius: '4px', border: '1px solid #ccc' }}
                             />
                         </label>
-                        <button type="button" onClick={() => removeCustomProperty(index)} style={{ marginBottom: '10px' }}>Remove</button>
+                        <button type="button" onClick={() => removeCustomProperty(index)} style={{ marginBottom: '10px' }}>
+                            Remove
+                        </button>
                     </div>
                 ))}
-                <button type="button" onClick={addCustomProperty} style={{ marginBottom: '10px' }}>Add Custom Property</button>
+                <button type="button" onClick={addCustomProperty} style={{ marginBottom: '10px' }}>
+                    Add Custom Property
+                </button>
                 <br />
-                <button type="submit" style={{ padding: '10px 20px', backgroundColor: '#4CAF50', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>Create Paper</button>
+                <button
+                    type="submit"
+                    style={{
+                        padding: '10px 20px',
+                        backgroundColor: '#4CAF50',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '5px',
+                        cursor: 'pointer',
+                    }}
+                >
+                    Create Paper
+                </button>
             </form>
         </div>
     );

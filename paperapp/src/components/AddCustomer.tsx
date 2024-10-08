@@ -1,18 +1,20 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';  // Import useNavigate for navigation
 import { addCustomer } from '../services/customerService';
 import { createOrder } from '../services/orderService';
 import { useAtom } from 'jotai';
 import { nameAtom, emailAtom, phoneAtom, addressAtom } from '../state/atoms/customerAtom';
 import { basketAtom, basketTotalPriceAtom } from '../state/atoms/basketAtom';
 import { Customer } from '../models/Customer';
-import {Order} from "../models/Order.tsx"; // Adjust the path as needed
+import { Order } from '../models/Order.tsx'; // Adjust the path as needed
 
 const AddCustomer: React.FC = () => {
+    const navigate = useNavigate(); // Get the navigate function
     const [name, setName] = useAtom(nameAtom);
     const [email, setEmail] = useAtom(emailAtom);
     const [phone, setPhone] = useAtom(phoneAtom);
     const [address, setAddress] = useAtom(addressAtom);
-    const [basket] = useAtom(basketAtom);
+    const [basket, setBasket] = useAtom(basketAtom);
     const [totalPrice] = useAtom(basketTotalPriceAtom);
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -20,9 +22,9 @@ const AddCustomer: React.FC = () => {
         const newCustomer: Customer = { name, email, phone, address };
 
         try {
+            // Create a new customer
             const addedCustomer = await addCustomer(newCustomer);
 
-            // Ensure customerId is defined
             if (!addedCustomer.id) {
                 throw new Error("Customer ID is undefined after creation.");
             }
@@ -30,28 +32,37 @@ const AddCustomer: React.FC = () => {
             // Prepare order details
             const orderDetails: Order = {
                 totalAmount: totalPrice,
-                customerId: addedCustomer.id, // Now guaranteed to be a number
+                customerId: addedCustomer.id,
                 orderEntries: basket.map(item => ({
                     productId: item.id,
-                    quantity: item.quantity ?? 0, // Ensure quantity is defined; default to 0 if undefined
+                    quantity: item.quantity ?? 0,  // Ensure quantity is defined; default to 0 if undefined
                 })),
             };
 
-            console.log('Order Details:', orderDetails); // Log order details
-
             // Create the order
-            await createOrder(orderDetails);
+            const createdOrder = await createOrder(orderDetails);
+
+            // Navigate to the confirmation page and pass the order details, customer details, and basket info
+            navigate('/order-confirmation', {
+                state: {
+                    orderDetails: createdOrder,
+                    customer: newCustomer,  // Pass customer details
+                    basket,                 // Pass basket items
+                    totalPrice,             // Pass total price
+                },
+            });
 
             // Reset the fields
             setName('');
             setEmail('');
             setPhone('');
             setAddress('');
+            setBasket([]);
+
         } catch (error) {
-            console.error('Error in handleSubmit:', error); // Log the error with context
+            console.error('Error in handleSubmit:', error);
         }
     };
-
 
     return (
         <form onSubmit={handleSubmit} style={styles.form}>

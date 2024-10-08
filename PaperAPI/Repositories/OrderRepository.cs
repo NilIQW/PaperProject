@@ -58,5 +58,25 @@ public class OrderRepository : IOrderRepository
             .ThenInclude(oe => oe.Product)          // Load the product for each order entry
             .FirstOrDefaultAsync(o => o.Id == id);
     }
+    
+    public async Task<IEnumerable<Order>> SearchOrdersByCustomerAsync(string query)
+    {
+        return await _context.Orders
+            .Include(o => o.Customer)
+            .Where(o => o.Customer.Name.Contains(query) || o.Customer.Email.Contains(query))
+            .Include(o => o.OrderEntries)
+            .ThenInclude(oe => oe.Product)
+            .ToListAsync();
+    }
+    
+    public async Task<IEnumerable<Order>> GetCustomerOrdersAsync(int customerId)
+    {
+        return await _context.Orders
+            .Where(o => o.CustomerId == customerId)
+            .Include(o => o.Customer)
+            .Include(o => o.OrderEntries)
+            .ThenInclude(oe => oe.Product)
+            .ToListAsync();
+    }
 
 }

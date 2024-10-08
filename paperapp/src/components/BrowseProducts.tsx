@@ -11,7 +11,7 @@ const BrowseProducts: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [customProperties] = useAtom(customPropertiesAtom);
-    const [isAdmin, setIsAdmin] = useState(false); // New state for user/admin mode
+    const [isAdmin, setIsAdmin] = useState(false);
 
     useEffect(() => {
         const fetchPapers = async () => {
@@ -80,7 +80,7 @@ const BrowseProducts: React.FC = () => {
                             <ul>
                                 {customProperties.map((property, index) => (
                                     <li key={index}>
-                                        <strong>{property.name}: </strong> {property.name}
+                                        <strong>{property.propertyName}: </strong>
                                     </li>
                                 ))}
                             </ul>

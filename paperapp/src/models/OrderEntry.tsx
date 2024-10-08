@@ -1,5 +1,11 @@
-// src/models/OrderEntry.ts
+import { Order } from './Order';
+import { Paper } from './Paper';
+
 export interface OrderEntry {
-    productId: number; // Assuming productId is of type number
+    id: number;
     quantity: number;
+    productId?: number; // Nullable in the database
+    orderId?: number; // Nullable in the database
+    order?: Order;
+    product?: Paper;
 }

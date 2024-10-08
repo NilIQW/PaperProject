@@ -18,6 +18,19 @@ public class OrdersController : ControllerBase
         _orderEntryRepository = orderEntryRepository;
     }
 
+    // Get all orders
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<Order>>> GetAllOrders()
+    {
+        var orders = await _orderRepository.GetAllAsync();
+
+        if (orders == null || !orders.Any())
+        {
+            return NotFound("No orders found.");
+        }
+
+        return Ok(orders);
+    }
     [HttpGet("{id}")]
     public async Task<ActionResult<Order>> GetOrder(int id)
     {
@@ -30,8 +43,6 @@ public class OrdersController : ControllerBase
 
         return order;
     }
-    
-    
     [HttpPost]
     public async Task<ActionResult<Order>> CreateOrder(CreateOrderDTO createOrderDto)
     {
@@ -55,8 +66,9 @@ public class OrdersController : ControllerBase
 
         try
         {
-            await _orderRepository.AddAsync(order);
+            await _orderRepository.AddAsync(order); // Add the order first
 
+            // Now order.Id should be populated after SaveChangesAsync in AddAsync
             foreach (var entry in createOrderDto.OrderEntries)
             {
                 if (entry.Quantity <= 0)
@@ -66,7 +78,7 @@ public class OrdersController : ControllerBase
 
                 var orderEntry = new OrderEntry
                 {
-                    OrderId = order.Id,
+                    OrderId = order.Id, // Ensure the order ID is set correctly
                     ProductId = entry.ProductId,
                     Quantity = entry.Quantity
                 };
@@ -79,6 +91,33 @@ public class OrdersController : ControllerBase
         {
             return StatusCode(500, $"Internal server error: {ex.Message}");
         }
+    }
+
+    
+    [HttpGet("search")]
+    public async Task<ActionResult<IEnumerable<Order>>> SearchOrders([FromQuery] string query)
+    {
+        var orders = await _orderRepository.SearchOrdersByCustomerAsync(query);
+
+        if (orders == null || !orders.Any())
+        {
+            return NotFound("No orders found for this search.");
+        }
+
+        return Ok(orders);
+    }
+    
+    [HttpGet("customer/{customerId}")]
+    public async Task<ActionResult<IEnumerable<Order>>> GetCustomerOrders(int customerId)
+    {
+        var orders = await _orderRepository.GetCustomerOrdersAsync(customerId);
+
+        if (orders == null || !orders.Any())
+        {
+            return NotFound();
+        }
+
+        return Ok(orders);
     }
     
     

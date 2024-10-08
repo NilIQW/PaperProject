@@ -6,6 +6,8 @@ import BasketIcon from "./components/BasketIcon.tsx";
 import CreatePaper from "./components/CreatePaper.tsx";
 import EditPaper from "./components/EditPaper.tsx";
 import AddCustomer from "./components/AddCustomer.tsx";
+import OrderConfirmation from "./components/OrderConfirmation.tsx";
+import OrderHistory from "./components/OrderHistory.tsx";
 
 const App: React.FC = () => {
     return (
@@ -34,6 +36,9 @@ const App: React.FC = () => {
                         <Route path="/create-paper" element={<CreatePaper />} />
                         <Route path="/edit-paper/:paperId" element={<EditPaper />} />
                         <Route path="/customer-info" element={<AddCustomer />} />
+                        <Route path="/order-confirmation" element={<OrderConfirmation />} />
+                        <Route path="/order-history" element={<OrderHistory />} />
+
 
                     </Routes>
                 </div>

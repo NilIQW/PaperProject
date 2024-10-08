@@ -1,7 +1,7 @@
-// src/models/Property.tsx
+import { PaperProperty } from './PaperProperty';
+
 export interface Property {
-    id?: number;
-    name?: string;
+    id: number;
+    propertyName: string;
+    paperProperties: PaperProperty[];
 }
-
-

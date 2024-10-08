@@ -1,7 +1,10 @@
+import {Order} from "./Order.tsx";
+
 export interface Customer {
-    id?: number;
+    id: number;
     name: string;
-    email: string;
-    phone: string;
-    address: string;
+    address?: string;
+    phone?: string;
+    email?: string;
+    orders: Order[];
 }
