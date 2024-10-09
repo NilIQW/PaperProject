@@ -33,6 +33,7 @@ const AddCustomer: React.FC = () => {
             const orderDetails: Order = {
                 totalAmount: totalPrice,
                 customerId: addedCustomer.id,
+                status: "Pending", // Add a default status
                 orderEntries: basket.map(item => ({
                     productId: item.id,
                     quantity: item.quantity ?? 0,  // Ensure quantity is defined; default to 0 if undefined

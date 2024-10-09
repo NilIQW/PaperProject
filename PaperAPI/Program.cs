@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using PaperAPI.Models;
 using PaperAPI.Repositories;
 
@@ -35,7 +36,9 @@ public class Program // Explicitly declare this class as public
         builder.Services.AddControllers()
             .AddJsonOptions(options =>
             {
+                options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
             });
+
 
         builder.Services.AddControllers(); 
         
