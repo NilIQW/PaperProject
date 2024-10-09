@@ -26,9 +26,12 @@ const CreatePaper: React.FC = () => {
                 paperProperties: customProperties.map((prop) => ({
                     propertyName: prop.propertyName,
                 })), // Mapping the custom properties correctly
+                orderEntries: [] // Pass an empty array if not used
             });
 
-            navigate('/');
+            if (response) {
+                navigate('/');
+            }
         } catch (err) {
             console.error('Error creating paper:', err);
         }
@@ -41,9 +44,14 @@ const CreatePaper: React.FC = () => {
     };
 
     const addCustomProperty = () => {
-        const newProperty: Property = { id: Date.now(), propertyName: '' };
+        const newProperty: Property = {
+            id: Date.now(),
+            propertyName: '',
+            paperProperties: []
+        };
         setCustomProperties([...customProperties, newProperty]);
     };
+
 
     const removeCustomProperty = (index: number) => {
         const newProperties = customProperties.filter((_, i) => i !== index);

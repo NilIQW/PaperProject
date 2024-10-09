@@ -10,6 +10,6 @@ public class UpdatePaperDTO
     
     public int? SheetsPerPacket { get; set; }
     
-    public List<PropertyDTO.PropertyDTO> Properties { get; set; } = new List<PropertyDTO.PropertyDTO>();
+    public List<PropertyDTO.PropertyDTO>? Properties { get; set; } = new List<PropertyDTO.PropertyDTO>();
 
 }

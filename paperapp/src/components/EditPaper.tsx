@@ -1,47 +1,52 @@
 import React, { useEffect, useState } from 'react';
 import { useAtom } from 'jotai';
 import { paperAtom } from '../state/atoms/paperAtom';
-import { updatePaper, getPaperById } from '../services/paperService';
+import { updatePaper } from '../services/paperService';
 import { useNavigate, useParams } from 'react-router-dom';
 import { customPropertiesAtom } from '../state/atoms/CustomPropertiesAtom';
 import { Property } from '../models/Property';
+import { fetchPaperById } from '../services/paperService';
 
 const EditPaper: React.FC = () => {
-    const { id } = useParams<{ id: string }>();
     const [paper, setPaper] = useAtom(paperAtom);
     const [customProperties, setCustomProperties] = useAtom(customPropertiesAtom);
     const [imageFile, setImageFile] = useState<File | null>(null);
     const navigate = useNavigate();
+    const { id } = useParams<{ id: string }>();
 
     useEffect(() => {
-        const fetchPaper = async () => {
+        const fetchData = async () => {
             if (id) {
-                const fetchedPaper = await getPaperById(parseInt(id));
-                setPaper(fetchedPaper);
-                setCustomProperties(fetchedPaper.customProperties || []);
+                const fetchedPaper = await fetchPaperById(parseInt(id));
+                if (fetchedPaper) {
+                    setPaper(fetchedPaper);
+                    setCustomProperties(fetchedPaper.paperProperties || []);
+                }
             }
         };
 
-        fetchPaper();
+        fetchData();
     }, [id, setPaper, setCustomProperties]);
 
     const handleUpdate = async (e: React.FormEvent) => {
         e.preventDefault();
 
         try {
-            await updatePaper(parseInt(id!), {
+            const updatedPaper = await updatePaper(paper.id, {
                 name: paper.name,
                 discontinued: paper.discontinued,
                 stock: paper.stock,
                 price: paper.price,
                 imageUrl: imageFile ? URL.createObjectURL(imageFile) : paper.imageUrl,
                 sheetsPerPacket: paper.sheetsPerPacket,
-                customProperties: customProperties.map(prop => ({
-                    name: prop.name,
+                properties: customProperties.map((prop) => ({
+                    id: prop.id, // Assuming you have an ID for the properties
+                    propertyName: prop.propertyName,
                 })),
             });
 
-            navigate('/');
+            console.log('Paper updated:', updatedPaper);
+            navigate('/'); // Navigate after successful update
         } catch (err) {
             console.error('Error updating paper:', err);
         }
@@ -49,12 +54,16 @@ const EditPaper: React.FC = () => {
 
     const handlePropertyChange = (index: number, value: string) => {
         const newProperties = [...customProperties];
-        newProperties[index] = { ...newProperties[index], name: value };
+        newProperties[index] = { ...newProperties[index], propertyName: value };
         setCustomProperties(newProperties);
     };
 
     const addCustomProperty = () => {
-        const newProperty: Property = { id: Date.now(), name: '' };
+        const newProperty: Property = {
+            id: Date.now(), // Temporary ID, consider using a proper ID from the backend if available
+            propertyName: '',
+            paperProperties: []
+        };
         setCustomProperties([...customProperties, newProperty]);
     };
 
@@ -67,7 +76,7 @@ const EditPaper: React.FC = () => {
         const file = e.target.files?.[0];
         if (file) {
             setImageFile(file);
-            setPaper({ ...paper, imageUrl: URL.createObjectURL(file) }); // Optional: Display the image preview
+            setPaper({ ...paper, imageUrl: URL.createObjectURL(file) });
         }
     };
 
@@ -79,7 +88,7 @@ const EditPaper: React.FC = () => {
                     Name:
                     <input
                         type="text"
-                        value={paper.name || ''} // Ensure it doesn't throw an error if undefined
+                        value={paper.name}
                         onChange={(e) => setPaper({ ...paper, name: e.target.value })}
                         required
                         style={{ width: '100%', padding: '8px', marginBottom: '10px', borderRadius: '4px', border: '1px solid #ccc' }}
@@ -90,8 +99,8 @@ const EditPaper: React.FC = () => {
                     Price:
                     <input
                         type="number"
-                        value={paper.price || 0} // Ensure it defaults to 0
-                        onChange={(e) => setPaper({ ...paper, price: parseFloat(e.target.value) })}
+                        value={paper.price}
+                        onChange={(e) => setPaper({ ...paper, price: Number(e.target.value) })}
                         required
                         style={{ width: '100%', padding: '8px', marginBottom: '10px', borderRadius: '4px', border: '1px solid #ccc' }}
                     />
@@ -101,19 +110,20 @@ const EditPaper: React.FC = () => {
                     Stock:
                     <input
                         type="number"
-                        value={paper.stock || 0} // Ensure it defaults to 0
-                        onChange={(e) => setPaper({ ...paper, stock: parseInt(e.target.value) })}
+                        value={paper.stock}
+                        onChange={(e) => setPaper({ ...paper, stock: Number(e.target.value) })}
                         required
                         style={{ width: '100%', padding: '8px', marginBottom: '10px', borderRadius: '4px', border: '1px solid #ccc' }}
                     />
                 </label>
                 <br />
                 <label>
-                    Sheets per Packet:
+                    Sheets Per Packet:
                     <input
                         type="number"
-                        value={paper.sheetsPerPacket || 0} // Ensure it defaults to 0
-                        onChange={(e) => setPaper({ ...paper, sheetsPerPacket: parseInt(e.target.value) })}
+                        value={paper.sheetsPerPacket}
+                        onChange={(e) => setPaper({ ...paper, sheetsPerPacket: Number(e.target.value) })}
+                        required
                         style={{ width: '100%', padding: '8px', marginBottom: '10px', borderRadius: '4px', border: '1px solid #ccc' }}
                     />
                 </label>
@@ -122,42 +132,52 @@ const EditPaper: React.FC = () => {
                     Image URL:
                     <input
                         type="text"
-                        value={paper.imageUrl || ''} // Ensure it doesn't throw an error if undefined
+                        value={paper.imageUrl || ''}
                         onChange={(e) => setPaper({ ...paper, imageUrl: e.target.value })}
-                        placeholder="Or upload an image file"
                         style={{ width: '100%', padding: '8px', marginBottom: '10px', borderRadius: '4px', border: '1px solid #ccc' }}
                     />
                 </label>
                 <br />
                 <label>
-                    Upload Image:
-                    <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleFileChange}
-                        style={{ marginBottom: '10px' }}
-                    />
+                    File Upload:
+                    <input type="file" onChange={handleFileChange} style={{ marginBottom: '10px' }} />
                 </label>
                 <br />
                 <h3>Custom Properties</h3>
                 {customProperties.map((property, index) => (
-                    <div key={index}>
+                    <div key={property.id}>
                         <label>
-                            Name
+                            Name:
                             <input
                                 type="text"
-                                value={property.name || ''} // Ensure it doesn't throw an error if undefined
+                                value={property.propertyName}
                                 onChange={(e) => handlePropertyChange(index, e.target.value)}
                                 required
                                 style={{ width: '100%', padding: '8px', marginBottom: '10px', borderRadius: '4px', border: '1px solid #ccc' }}
                             />
                         </label>
-                        <button type="button" onClick={() => removeCustomProperty(index)} style={{ marginBottom: '10px' }}>Remove</button>
+                        <button type="button" onClick={() => removeCustomProperty(index)} style={{ marginBottom: '10px' }}>
+                            Remove
+                        </button>
                     </div>
                 ))}
-                <button type="button" onClick={addCustomProperty} style={{ marginBottom: '10px' }}>Add Custom Property</button>
+                <button type="button" onClick={addCustomProperty} style={{ marginBottom: '10px' }}>
+                    Add Custom Property
+                </button>
                 <br />
-                <button type="submit" style={{ padding: '10px 20px', backgroundColor: '#4CAF50', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>Update Paper</button>
+                <button
+                    type="submit"
+                    style={{
+                        padding: '10px 20px',
+                        backgroundColor: '#4CAF50',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '5px',
+                        cursor: 'pointer',
+                    }}
+                >
+                    Update Paper
+                </button>
             </form>
         </div>
     );

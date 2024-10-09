@@ -150,22 +150,72 @@ public async Task<ActionResult<PaperDTO>> PostPaper(CreatePaperDTO createPaperDt
 }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> PutPaper(int id, UpdatePaperDTO updatePaperDto)
+public async Task<IActionResult> PutPaper(int id, UpdatePaperDTO updatePaperDto)
+{
+    var existingPaper = await _paperRepository.GetByIdAsync(id);
+    if (existingPaper == null) return NotFound();
+
+    // Update existing paper properties only if they are provided
+    if (updatePaperDto.Name != null)
+        existingPaper.Name = updatePaperDto.Name;
+
+    existingPaper.Discontinued = updatePaperDto.Discontinued ?? existingPaper.Discontinued; // Maintain existing value if null
+    existingPaper.Stock = updatePaperDto.Stock ?? existingPaper.Stock; // Maintain existing value if null
+    existingPaper.Price = updatePaperDto.Price ?? existingPaper.Price; // Maintain existing value if null
+    if (updatePaperDto.ImageUrl != null)
+        existingPaper.ImageUrl = updatePaperDto.ImageUrl;
+
+    existingPaper.SheetsPerPacket = updatePaperDto.SheetsPerPacket ?? existingPaper.SheetsPerPacket; // Maintain existing value if null
+
+    // Clear existing PaperProperties
+    existingPaper.PaperProperties.Clear();
+
+    // Handle updating properties
+    if (updatePaperDto.Properties != null)
     {
-        var existingPaper = await _paperRepository.GetByIdAsync(id);
-        if (existingPaper == null) return NotFound();
-
-        existingPaper.Name = updatePaperDto.Name ?? existingPaper.Name;
-        existingPaper.Discontinued = updatePaperDto.Discontinued ?? existingPaper.Discontinued;
-        existingPaper.Stock = updatePaperDto.Stock ?? existingPaper.Stock;
-        existingPaper.Price = updatePaperDto.Price ?? existingPaper.Price;
-        existingPaper.ImageUrl = updatePaperDto.ImageUrl ?? existingPaper.ImageUrl;
-        existingPaper.SheetsPerPacket = updatePaperDto.SheetsPerPacket ?? existingPaper.SheetsPerPacket;
-
-        await _paperRepository.UpdateAsync(existingPaper);
-
-        return NoContent();
+        foreach (var propertyDto in updatePaperDto.Properties)
+        {
+            // Check if property already exists based on Property ID
+            var existingProperty = await _propertyRepository.GetByIdAsync(propertyDto.Id);
+            if (existingProperty != null)
+            {
+                // Associate the existing property with the paper
+                existingPaper.PaperProperties.Add(new PaperProperty
+                {
+                    PaperId = existingPaper.Id,
+                    PropertyId = existingProperty.Id
+                });
+            }
+            else
+            {
+                return BadRequest($"Property with ID {propertyDto.Id} does not exist.");
+            }
+        }
     }
+
+    // Save changes
+    await _paperRepository.UpdateAsync(existingPaper);
+
+    // Return the updated paper object
+    var paperDto = new PaperDTO 
+    {
+        Id = existingPaper.Id,
+        Name = existingPaper.Name,
+        Discontinued = existingPaper.Discontinued, // Should be nullable
+        Stock = existingPaper.Stock, // Should be nullable
+        Price = existingPaper.Price, // Should be nullable
+        ImageUrl = existingPaper.ImageUrl,
+        SheetsPerPacket = existingPaper.SheetsPerPacket, // Should be nullable
+        Properties = existingPaper.PaperProperties.Select(pp => new PropertyDTO
+        {
+            Id = pp.Property.Id,
+            PropertyName = pp.Property.PropertyName,
+        }).ToList(),
+    };
+
+    return Ok(paperDto); // Send the updated paper back as a response
+}
+
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeletePaper(int id)

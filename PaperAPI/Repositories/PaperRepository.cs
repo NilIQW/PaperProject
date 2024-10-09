@@ -24,8 +24,8 @@ public class PaperRepository : IRepository<Paper>
     public async Task<Paper> GetByIdAsync(int id)
     {
         return await _context.Papers
-            .Include(p => p.PaperProperties) // Include PaperProperties for the single paper
-            .ThenInclude(pp => pp.Property) // Include the related Property
+            .Include(p => p.PaperProperties) 
+            .ThenInclude(pp => pp.Property) 
             .FirstOrDefaultAsync(p => p.Id == id);
     }
 

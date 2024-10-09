@@ -18,7 +18,7 @@ const BrowseProducts: React.FC = () => {
             try {
                 const fetchedPapers = await getPapers();
                 // @ts-ignore
-                setPapers(fetchedPapers.$values);
+                setPapers(fetchedPapers);
             } catch (err) {
                 setError(err instanceof Error ? err.message : 'An error occurred');
             } finally {

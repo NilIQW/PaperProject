@@ -12,7 +12,7 @@ public partial class Property
 
     [Column("property_name")]
     [StringLength(255)]
-    public string PropertyName { get; set; } = null!;
+    public string? PropertyName { get; set; } = null!;
 
     [InverseProperty("Property")]
     public virtual ICollection<PaperProperty> PaperProperties { get; set; } = new List<PaperProperty>();

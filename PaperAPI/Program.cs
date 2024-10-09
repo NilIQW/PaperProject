@@ -35,7 +35,6 @@ public class Program // Explicitly declare this class as public
         builder.Services.AddControllers()
             .AddJsonOptions(options =>
             {
-                options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
             });
 
         builder.Services.AddControllers(); 

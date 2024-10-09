@@ -35,5 +35,5 @@ public partial class Paper
     public virtual ICollection<OrderEntry> OrderEntries { get; set; } = new List<OrderEntry>();
 
     [InverseProperty("Paper")]
-    public virtual ICollection<PaperProperty> PaperProperties { get; set; } = new List<PaperProperty>();
+    public virtual ICollection<PaperProperty>? PaperProperties { get; set; } = new List<PaperProperty>();
 }

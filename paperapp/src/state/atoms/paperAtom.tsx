@@ -9,5 +9,7 @@ export const paperAtom = atom<Paper>({
     quantity: 0,
     sheetsPerPacket: 0,
     imageUrl: '',
-    discontinued: false
+    discontinued: false,
+    orderEntries: [],
+    paperProperties: []
 });

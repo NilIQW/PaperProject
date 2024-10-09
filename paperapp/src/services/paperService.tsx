@@ -14,14 +14,17 @@ export const getPapers = async (): Promise<Paper[]> => {
 };
 
 
-// Fetch a single paper by ID
-export const getPaperById = async (id: number): Promise<Paper> => {
-    const response = await fetch(`${API_URL}/${id}`);
-    if (!response.ok) {
-        throw new Error(`Failed to fetch paper with id ${id}`);
-    }
-    return await response.json();
-};
+export const fetchPaperById = async (id: number) => {
+    try {
+        const response = await fetch(`${API_URL}/${id}`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch paper');
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Error fetching paper:', error);
+        throw error;
+    }}
 
 export const createPaper = async (paperData: any) => {
     const response = await fetch(API_URL, {
@@ -43,9 +46,8 @@ export const createPaper = async (paperData: any) => {
 };
 
 
-// Update an existing paper
-export const updatePaper = async (id: number, paperData: any): Promise<Paper> => {
-    const response = await fetch(`${API_URL}/${id}`, {
+export const updatePaper = async (id: number, paperData: Paper) => {
+    const response = await fetch(`http://localhost:5074/api/Paper/${id}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
@@ -54,9 +56,7 @@ export const updatePaper = async (id: number, paperData: any): Promise<Paper> =>
     });
 
     if (!response.ok) {
-        const errorText = await response.text();
-        console.error("Error updating paper:", errorText);
-        throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+        throw new Error(`Error updating paper: ${response.statusText}`);
     }
 
     return await response.json();
