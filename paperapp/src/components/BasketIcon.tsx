@@ -18,7 +18,7 @@ const BasketIcon: React.FC = () => {
     };
 
     return (
-        <div style={{ position: 'fixed', top: '10px', right: '10px', display: 'flex', alignItems: 'center' }}>
+        <div style={{ position: 'relative', top: '60px', left: '950px', display: 'flex', alignItems: 'center'}}>
             <div onClick={handleBasketClick} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
                 <img src={BasketIconSVG} alt="Basket" style={{ width: '40px' }} />
                 <span style={{ fontWeight: 'bold', fontSize: '20px', marginLeft: '8px' }}>

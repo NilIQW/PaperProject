@@ -24,8 +24,10 @@ const CreatePaper: React.FC = () => {
                 imageUrl: imageFile ? URL.createObjectURL(imageFile) : paper.imageUrl,
                 sheetsPerPacket: paper.sheetsPerPacket,
                 paperProperties: customProperties.map((prop) => ({
+                    paperId: paper.id,
+                    propertyId: prop.id,
                     propertyName: prop.propertyName,
-                })), // Mapping the custom properties correctly
+                })),
                 orderEntries: [] // Pass an empty array if not used
             });
 
@@ -110,6 +112,16 @@ const CreatePaper: React.FC = () => {
                         value={paper.sheetsPerPacket}
                         onChange={(e) => setPaper({ ...paper, sheetsPerPacket: parseInt(e.target.value) })}
                         style={{ width: '100%', padding: '8px', marginBottom: '10px', borderRadius: '4px', border: '1px solid #ccc' }}
+                    />
+                </label>
+                <br />
+                <label>
+                    Discontinued:
+                    <input
+                        type="checkbox"
+                        checked={paper.discontinued}
+                        onChange={(e) => setPaper({ ...paper, discontinued: e.target.checked })}
+                        style={{ marginBottom: '10px' }}
                     />
                 </label>
                 <br />

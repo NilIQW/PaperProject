@@ -40,13 +40,13 @@ const EditPaper: React.FC = () => {
                 imageUrl: imageFile ? URL.createObjectURL(imageFile) : paper.imageUrl,
                 sheetsPerPacket: paper.sheetsPerPacket,
                 properties: customProperties.map((prop) => ({
-                    id: prop.id, // Assuming you have an ID for the properties
+                    id: prop.id,
                     propertyName: prop.propertyName,
                 })),
             });
 
             console.log('Paper updated:', updatedPaper);
-            navigate('/'); // Navigate after successful update
+            navigate('/');
         } catch (err) {
             console.error('Error updating paper:', err);
         }
@@ -60,7 +60,7 @@ const EditPaper: React.FC = () => {
 
     const addCustomProperty = () => {
         const newProperty: Property = {
-            id: Date.now(), // Temporary ID, consider using a proper ID from the backend if available
+            id: Date.now(),
             propertyName: '',
             paperProperties: []
         };
@@ -141,6 +141,16 @@ const EditPaper: React.FC = () => {
                 <label>
                     File Upload:
                     <input type="file" onChange={handleFileChange} style={{ marginBottom: '10px' }} />
+                </label>
+                <br />
+                <label>
+                    Discontinued:
+                    <input
+                        type="checkbox"
+                        checked={paper.discontinued}
+                        onChange={(e) => setPaper({ ...paper, discontinued: e.target.checked })}
+                        style={{ marginLeft: '10px' }}
+                    />
                 </label>
                 <br />
                 <h3>Custom Properties</h3>

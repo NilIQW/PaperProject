@@ -120,5 +120,29 @@ public class OrdersController : ControllerBase
         return Ok(orders);
     }
     
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateOrder(int id, [FromBody] Order updatedOrder)
+    {
+        if (updatedOrder == null)
+        {
+            return BadRequest("Order is null.");
+        }
+
+        // Check if the order exists
+        var existingOrder = await _orderRepository.GetByIdAsync(id);
+        if (existingOrder == null)
+        {
+            return NotFound($"Order with ID {id} not found.");
+        }
+
+        // Update only the necessary fields
+        existingOrder.Status = updatedOrder.Status; // Update the status
+        existingOrder.DeliveryDate = updatedOrder.DeliveryDate; // Update the delivery date
+
+        // Call the repository to update the order
+        await _orderRepository.UpdateAsync(existingOrder);
+
+        return NoContent(); // Return 204 No Content on successful update
+    }
     
 }

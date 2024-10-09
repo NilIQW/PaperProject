@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getPapers } from '../services/paperService';
+import { getPapers, deletePaper } from '../services/paperService'; // Import the deletePaper function
 import { Paper } from '../models/Paper';
 import AddToBasketButton from './AddToBasketButton';
 import { Link } from 'react-router-dom';
@@ -17,7 +17,6 @@ const BrowseProducts: React.FC = () => {
         const fetchPapers = async () => {
             try {
                 const fetchedPapers = await getPapers();
-                // @ts-ignore
                 setPapers(fetchedPapers);
             } catch (err) {
                 setError(err instanceof Error ? err.message : 'An error occurred');
@@ -33,23 +32,50 @@ const BrowseProducts: React.FC = () => {
         setIsAdmin(!isAdmin); // Toggle between admin and user modes
     };
 
+    const handleDelete = async (paperId: number) => {
+        try {
+            await deletePaper(paperId); // Call the deletePaper function to remove the paper
+            setPapers(papers.filter(paper => paper.id !== paperId)); // Remove the deleted paper from the state
+        } catch (err) {
+            console.error('Error deleting paper:', err);
+        }
+    };
+
     if (loading) return <div>Loading...</div>;
     if (error) return <div>Error: {error}</div>;
 
     return (
-        <div style={{margin:'60px', marginLeft: '100px' }}>
+        <div style={{ margin: '60px', marginLeft: '100px' }}>
             <h2>Browse Products</h2>
 
             <button
                 onClick={toggleMode}
-                style={{ padding: '10px 20px', margin: '20px 20px 0 0', backgroundColor: isAdmin ? '#36abf4' : '#4CAF50', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}
+                style={{
+                    padding: '10px 20px',
+                    margin: '20px 20px 0 0',
+                    backgroundColor: isAdmin ? '#36abf4' : '#4CAF50',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '5px',
+                    cursor: 'pointer'
+                }}
             >
                 {isAdmin ? 'Switch to User Mode' : 'Switch to Admin Mode'}
             </button>
 
             {isAdmin && (
                 <Link to="/create-paper">
-                    <button style={{ marginBottom: '20px', padding: '10px 20px', backgroundColor: '#4CAF50', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>
+                    <button
+                        style={{
+                            marginBottom: '20px',
+                            padding: '10px 20px',
+                            backgroundColor: '#4CAF50',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '5px',
+                            cursor: 'pointer'
+                        }}
+                    >
                         Create New Paper
                     </button>
                 </Link>
@@ -64,7 +90,6 @@ const BrowseProducts: React.FC = () => {
                         width: '380px',
                         textAlign: 'center',
                         borderRadius: '8px',
-
                     }}>
                         <img src={paper.imageUrl} alt={paper.name}
                              style={{ width: '100%', height: '250px', objectFit: 'cover', borderRadius: '8px' }} />
@@ -87,19 +112,35 @@ const BrowseProducts: React.FC = () => {
                         </div>
 
                         {isAdmin && (
-                            <Link to={`/edit-paper/${paper.id}`}>
-                                <button style={{
-                                    marginTop: '10px',
-                                    padding: '10px 20px',
-                                    backgroundColor: '#008CBA',
-                                    color: 'white',
-                                    border: 'none',
-                                    borderRadius: '5px',
-                                    cursor: 'pointer'
-                                }}>
-                                    Edit Paper
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px' }}>
+                                <Link to={`/edit-paper/${paper.id}`}>
+                                    <button
+                                        style={{
+                                            padding: '10px 20px',
+                                            backgroundColor: '#008CBA',
+                                            color: 'white',
+                                            border: 'none',
+                                            borderRadius: '5px',
+                                            cursor: 'pointer'
+                                        }}
+                                    >
+                                        Edit Paper
+                                    </button>
+                                </Link>
+                                <button
+                                    onClick={() => handleDelete(paper.id)}
+                                    style={{
+                                        padding: '5px 10px',
+                                        backgroundColor: 'red',
+                                        color: 'white',
+                                        border: 'none',
+                                        borderRadius: '5px',
+                                        cursor: 'pointer'
+                                    }}
+                                >
+                                    Delete
                                 </button>
-                            </Link>
+                            </div>
                         )}
                     </div>
                 ))}

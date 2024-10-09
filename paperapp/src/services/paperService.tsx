@@ -25,24 +25,21 @@ export const fetchPaperById = async (id: number) => {
         console.error('Error fetching paper:', error);
         throw error;
     }}
-
 export const createPaper = async (paperData: any) => {
     const response = await fetch(API_URL, {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/json', // Explicitly setting the content type to JSON
         },
-        body: JSON.stringify(paperData),
+        body: JSON.stringify(paperData), // Convert the paper data to JSON
     });
 
     if (!response.ok) {
-        const errorText = await response.text();
-        console.error("Error creating paper:", errorText);
-        throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+        const errorMessage = await response.text();
+        throw new Error(`Failed to create paper: ${errorMessage}`);
     }
 
-    const createdPaper = await response.json();
-    return createdPaper;
+    return response.json(); // Parse the JSON response if the request was successful
 };
 
 
