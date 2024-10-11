@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';  // Import useNavigate for navig
 import { addCustomer } from '../services/customerService';
 import { createOrder } from '../services/orderService';
 import { useAtom } from 'jotai';
-import { nameAtom, emailAtom, phoneAtom, addressAtom } from '../state/atoms/customerAtom';
-import { basketAtom, basketTotalPriceAtom } from '../state/atoms/basketAtom';
+import { nameAtom, emailAtom, phoneAtom, addressAtom } from '../atoms/customerAtom';
+import { basketAtom, basketTotalPriceAtom } from '../atoms/basketAtom';
 import { Customer } from '../models/Customer';
 import { Order } from '../models/Order.tsx'; // Adjust the path as needed
 

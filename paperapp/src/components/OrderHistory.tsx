@@ -1,16 +1,24 @@
 // src/components/OrderHistory.tsx
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
+import { useAtom } from 'jotai';
 import { getOrders, updateOrderStatus } from '../services/orderService'; // Ensure this service has the update function
+import {
+    ordersAtom,
+    filteredOrdersAtom,
+    searchTermAtom,
+    selectedOrderAtom,
+    deliveryDateAtom
+} from '../atoms/orderHistoryAtom.tsx';
 import { Order } from '../models/Order';
 import { OrderEntry } from '../models/OrderEntry'; // Adjust path if necessary
 
 const OrderHistory: React.FC = () => {
-    const [orders, setOrders] = useState<Order[]>([]);
-    const [searchTerm, setSearchTerm] = useState('');
-    const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
-    const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-    const [deliveryDate, setDeliveryDate] = useState<string>('');
+    const [orders, setOrders] = useAtom(ordersAtom);
+    const [filteredOrders, setFilteredOrders] = useAtom(filteredOrdersAtom);
+    const [searchTerm, setSearchTerm] = useAtom(searchTermAtom);
+    const [selectedOrder, setSelectedOrder] = useAtom(selectedOrderAtom);
+    const [deliveryDate, setDeliveryDate] = useAtom(deliveryDateAtom);
 
     useEffect(() => {
         const fetchOrders = async () => {
@@ -24,20 +32,19 @@ const OrderHistory: React.FC = () => {
         };
 
         fetchOrders();
-    }, []);
+    }, [setOrders, setFilteredOrders]);
 
     useEffect(() => {
         const results = orders.filter(order => {
-            const customerName = order.customer?.name.toLowerCase() || '';
-            // @ts-ignore
-            const customerEmail = order.customer?.email.toLowerCase() || '';
+            const customerName = order.customer?.name?.toLowerCase() || '';
+            const customerEmail = order.customer?.email?.toLowerCase() || '';
             return (
                 customerName.includes(searchTerm.toLowerCase()) ||
                 customerEmail.includes(searchTerm.toLowerCase())
             );
         });
         setFilteredOrders(results);
-    }, [searchTerm, orders]);
+    }, [searchTerm, orders, setFilteredOrders]);
 
     const handleOrderClick = (order: Order) => {
         setSelectedOrder(order);
@@ -48,17 +55,16 @@ const OrderHistory: React.FC = () => {
             const updatedOrder = {
                 ...selectedOrder,
                 status: 'Delivered',
-                deliveryDate
+                deliveryDate,
             };
 
-                await updateOrderStatus(updatedOrder);
-                const existingOrderIndex = orders.findIndex(order => order.id === updatedOrder.id);
-                const duplicate = [...orders];
-                duplicate[existingOrderIndex] = updatedOrder;
-                setOrders(duplicate);
-                setSelectedOrder(null); // Close the details view
-                setDeliveryDate(''); // Reset delivery date
-
+            await updateOrderStatus(updatedOrder);
+            const existingOrderIndex = orders.findIndex(order => order.id === updatedOrder.id);
+            const duplicate = [...orders];
+            duplicate[existingOrderIndex] = updatedOrder;
+            setOrders(duplicate);
+            setSelectedOrder(null); // Close the details view
+            setDeliveryDate(''); // Reset delivery date
         }
     };
 
@@ -74,7 +80,7 @@ const OrderHistory: React.FC = () => {
                 style={styles.searchInput}
             />
 
-            <table style={styles.table}>
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
                 <tr>
                     <th>Order ID</th>
@@ -150,10 +156,6 @@ const styles = {
         marginBottom: '16px',
         border: '1px solid #ccc',
         borderRadius: '4px',
-    },
-    table: {
-        width: '100%',
-        borderCollapse: 'collapse',
     },
     row: {
         cursor: 'pointer',

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAtom } from 'jotai';
-import { basketAtom, basketTotalPriceAtom } from '../state/atoms/basketAtom';
+import { basketAtom, basketTotalPriceAtom } from '../atoms/basketAtom';
 import { Paper } from '../models/Paper';
 import { useNavigate } from 'react-router-dom';
 

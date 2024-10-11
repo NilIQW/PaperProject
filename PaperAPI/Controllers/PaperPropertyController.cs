@@ -70,8 +70,9 @@ namespace PaperAPI.Controllers
         [HttpDelete("{paperId}/{propertyId}")]
         public async Task<ActionResult> DeletePaperProperty(int paperId, int propertyId)
         {
-            await _repository.DeletePaperProperty(paperId, propertyId);
+            await _repository.DeletePaperProperty(paperId, propertyId); // This only removes the association
             return NoContent();
         }
+
     }
 }

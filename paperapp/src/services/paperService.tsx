@@ -35,29 +35,40 @@ export const createPaper = async (paperData: any) => {
     });
 
     if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(`Failed to create paper: ${JSON.stringify(errorData)}`);
+        const errorMessage = await response.text();
+        throw new Error(`Failed to create paper: ${errorMessage}`);
     }
 
-    return await response.json();
+    return response.json();
 };
+export const updatePaper = async (paperId: number, paperData: Paper): Promise<boolean> => {
+    try {
+        const response = await fetch(`${API_URL}/${paperId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(paperData),
+        });
 
+        if (response.status === 204) {
+            // Return true for success, since there's no content to return
+            return true;
+        }
 
+        // Handle other response statuses if necessary
+        if (!response.ok) {
+            throw new Error(`Error updating paper: ${response.statusText}`);
+        }
 
-export const updatePaper = async (id: number, paperData: Paper) => {
-    const response = await fetch(`http://localhost:5074/api/Paper/${id}`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(paperData),
-    });
+        // In case of other response statuses, you might return false or handle as needed
+        const result = await response.json();
+        return result ? true : false;
 
-    if (!response.ok) {
-        throw new Error(`Error updating paper: ${response.statusText}`);
+    } catch (error) {
+        console.error(`Error updating paper: ${error}`);
+        return false; // Return false if there's an error
     }
-
-    return await response.json();
 };
 
 // Delete a paper by ID

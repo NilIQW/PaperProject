@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useAtom } from 'jotai';
-import { paperAtom } from '../state/atoms/paperAtom';
+import { paperAtom } from '../atoms/paperAtom';
 import { createPaper } from '../services/paperService';
 import { useNavigate } from 'react-router-dom';
-import { customPropertiesAtom } from '../state/atoms/CustomPropertiesAtom';
+import { customPropertiesAtom } from '../atoms/CustomPropertiesAtom';
 import { Property } from '../models/Property';
 
 const CreatePaper: React.FC = () => {

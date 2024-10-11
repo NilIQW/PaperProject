@@ -1,7 +1,7 @@
 // src/components/CustomerList.tsx
 import React, { useEffect } from 'react';
 import { useAtom } from 'jotai';
-import { customerAtom, loadCustomersAtom } from '../state/atoms/customerAtom';
+import { customerAtom, loadCustomersAtom } from '../atoms/customerAtom';
 
 const CustomerList: React.FC = () => {
     const [customers] = useAtom(customerAtom); // `customers` comes from the global atom

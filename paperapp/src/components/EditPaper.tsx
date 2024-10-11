@@ -1,103 +1,91 @@
 import React, { useEffect, useState } from 'react';
 import { useAtom } from 'jotai';
-import { paperAtom } from '../state/atoms/paperAtom';
-import { updatePaper } from '../services/paperService';
+import { paperAtom } from '../atoms/paperAtom';
+import { updatePaper, fetchPaperById } from '../services/paperService';
 import { useNavigate, useParams } from 'react-router-dom';
-import { customPropertiesAtom } from '../state/atoms/CustomPropertiesAtom';
+import { customPropertiesAtom } from '../atoms/CustomPropertiesAtom';
 import { Property } from '../models/Property';
-import { fetchPaperById } from '../services/paperService';
-
 
 const EditPaper: React.FC = () => {
     const [paper, setPaper] = useAtom(paperAtom);
     const [customProperties, setCustomProperties] = useAtom(customPropertiesAtom);
     const [imageFile, setImageFile] = useState<File | null>(null);
     const navigate = useNavigate();
-    const { id } = useParams<{ id: string }>();
+    const { id } = useParams<{ id: string }>(); // Get the paper ID from the URL parameters
 
+    // Fetch paper details by ID when the component mounts
     useEffect(() => {
-        const fetchData = async () => {
+        const loadPaper = async () => {
             if (id) {
-                const fetchedPaper = await fetchPaperById(parseInt(id));
-                if (fetchedPaper) {
+                try {
+                    const fetchedPaper = await fetchPaperById(Number(id));
                     setPaper(fetchedPaper);
-                    setCustomProperties(fetchedPaper.paperProperties || []);
+                    setCustomProperties(fetchedPaper.paperProperties); // Assuming `paperProperties` is the field for custom properties
+                } catch (error) {
+                    console.error('Failed to load paper:', error);
                 }
             }
         };
 
-        fetchData();
+        loadPaper();
     }, [id, setPaper, setCustomProperties]);
 
+    // Handle form submission
     const handleUpdate = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        try {
-            // Correct the API method for updating the paper
-            const updatedPaper = await updatePaper(paper.id, {
-                id: paper.id, orderEntries: [],
-                name: paper.name,
-                discontinued: paper.discontinued,
-                stock: paper.stock,
-                price: paper.price,
-                imageUrl: imageFile ? URL.createObjectURL(imageFile) : paper.imageUrl,
-                sheetsPerPacket: paper.sheetsPerPacket,
-                // Map customProperties to PaperProperty structure
-                Properties: customProperties.map((customProp) => ({
-                    paperId: paper.id, // Set the paperId
-                    propertyId: customProp.id, // The propertyId is the id of Property
-                    paper: {
-                        id: paper.id,
-                        name: paper.name,
-                        discontinued: paper.discontinued,
-                        stock: paper.stock,
-                        price: paper.price,
-                        imageUrl: paper.imageUrl,
-                        sheetsPerPacket: paper.sheetsPerPacket,
-                        orderEntries: paper.orderEntries, // Keep the original structure
-                    },
-                    property: {
-                        id: customProp.id,  // Assuming id is used for Property
-                        propertyName: customProp.propertyName,
-                        paperProperties: [] // You can pass an empty array or relevant data here if needed
-                    },
-                }))
-            });
+        // Construct the payload for paper update
+        const paperPayload = {
+            ...paper,
+            imageUrl: imageFile ? URL.createObjectURL(imageFile) : paper.imageUrl,
+            paperProperties: customProperties.map((prop) => ({
+                propertyName: prop.propertyName,
+                id : prop.id,
+            })),
+        };
 
-            console.log('Paper updated:', updatedPaper);
-            navigate('/');
+        try {
+            // Send the update paper request to the API
+            const response = await updatePaper(Number(id), paperPayload);
+
+            // If update is successful, navigate to the main page
+            if (response) {
+                navigate('/');
+            }
         } catch (err) {
             console.error('Error updating paper:', err);
         }
     };
 
-
-
+    // Handle changes to individual custom properties
     const handlePropertyChange = (index: number, value: string) => {
         const newProperties = [...customProperties];
         newProperties[index] = { ...newProperties[index], propertyName: value };
         setCustomProperties(newProperties);
     };
 
+    // Add a new custom property
     const addCustomProperty = () => {
         const newProperty: Property = {
-            id: Date.now(),
+            id: Date.now(), // Temporary unique ID for UI purposes
             propertyName: '',
-            paperProperties: []
+            paperProperties: [],
         };
         setCustomProperties([...customProperties, newProperty]);
     };
 
+    // Remove a custom property
     const removeCustomProperty = (index: number) => {
         const newProperties = customProperties.filter((_, i) => i !== index);
         setCustomProperties(newProperties);
     };
 
+    // Handle image file change
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
             setImageFile(file);
-            setPaper({ ...paper, imageUrl: URL.createObjectURL(file) });
+            setPaper({ ...paper, imageUrl: URL.createObjectURL(file) }); // Optional image preview
         }
     };
 
@@ -121,7 +109,7 @@ const EditPaper: React.FC = () => {
                     <input
                         type="number"
                         value={paper.price}
-                        onChange={(e) => setPaper({ ...paper, price: Number(e.target.value) })}
+                        onChange={(e) => setPaper({ ...paper, price: parseFloat(e.target.value) })}
                         required
                         style={{ width: '100%', padding: '8px', marginBottom: '10px', borderRadius: '4px', border: '1px solid #ccc' }}
                     />
@@ -132,36 +120,20 @@ const EditPaper: React.FC = () => {
                     <input
                         type="number"
                         value={paper.stock}
-                        onChange={(e) => setPaper({ ...paper, stock: Number(e.target.value) })}
+                        onChange={(e) => setPaper({ ...paper, stock: parseInt(e.target.value) })}
                         required
                         style={{ width: '100%', padding: '8px', marginBottom: '10px', borderRadius: '4px', border: '1px solid #ccc' }}
                     />
                 </label>
                 <br />
                 <label>
-                    Sheets Per Packet:
+                    Sheets per Packet:
                     <input
                         type="number"
                         value={paper.sheetsPerPacket}
-                        onChange={(e) => setPaper({ ...paper, sheetsPerPacket: Number(e.target.value) })}
-                        required
+                        onChange={(e) => setPaper({ ...paper, sheetsPerPacket: parseInt(e.target.value) })}
                         style={{ width: '100%', padding: '8px', marginBottom: '10px', borderRadius: '4px', border: '1px solid #ccc' }}
                     />
-                </label>
-                <br />
-                <label>
-                    Image URL:
-                    <input
-                        type="text"
-                        value={paper.imageUrl || ''}
-                        onChange={(e) => setPaper({ ...paper, imageUrl: e.target.value })}
-                        style={{ width: '100%', padding: '8px', marginBottom: '10px', borderRadius: '4px', border: '1px solid #ccc' }}
-                    />
-                </label>
-                <br />
-                <label>
-                    File Upload:
-                    <input type="file" onChange={handleFileChange} style={{ marginBottom: '10px' }} />
                 </label>
                 <br />
                 <label>
@@ -170,13 +142,34 @@ const EditPaper: React.FC = () => {
                         type="checkbox"
                         checked={paper.discontinued}
                         onChange={(e) => setPaper({ ...paper, discontinued: e.target.checked })}
-                        style={{ marginLeft: '10px' }}
+                        style={{ marginBottom: '10px' }}
+                    />
+                </label>
+                <br />
+                <label>
+                    Image URL:
+                    <input
+                        type="text"
+                        value={paper.imageUrl}
+                        onChange={(e) => setPaper({ ...paper, imageUrl: e.target.value })}
+                        placeholder="Or upload an image file"
+                        style={{ width: '100%', padding: '8px', marginBottom: '10px', borderRadius: '4px', border: '1px solid #ccc' }}
+                    />
+                </label>
+                <br />
+                <label>
+                    Upload Image:
+                    <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFileChange}
+                        style={{ marginBottom: '10px' }}
                     />
                 </label>
                 <br />
                 <h3>Custom Properties</h3>
                 {customProperties.map((property, index) => (
-                    <div key={property.id}>
+                    <div key={property.id || index}>
                         <label>
                             Name:
                             <input
@@ -192,6 +185,7 @@ const EditPaper: React.FC = () => {
                         </button>
                     </div>
                 ))}
+
                 <button type="button" onClick={addCustomProperty} style={{ marginBottom: '10px' }}>
                     Add Custom Property
                 </button>

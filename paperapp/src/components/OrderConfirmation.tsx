@@ -15,7 +15,6 @@ const OrderConfirmation: React.FC = () => {
 
             <div style={{ textAlign: 'left', marginBottom: '20px' }}>
                 <h3>Order Summary:</h3>
-                <p><strong>Order ID:</strong> {orderDetails.orderId}</p>
                 <p><strong>Total Amount:</strong> {totalPrice.toFixed(2)} DKK</p>
                 <p><strong>Number of Items:</strong> {basket.length}</p>
                 <p><strong>Customer Name:</strong> {customer.name}</p>

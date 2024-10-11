@@ -1,5 +1,5 @@
 import { atom } from 'jotai';
-import { Paper} from '../../models/Paper';
+import { Paper} from '../models/Paper.tsx';
 
 
 
@@ -8,6 +8,7 @@ export const basketAtom = atom<Paper[]>([]);
 // Atom to calculate total quantity of products in the basket
 export const basketTotalAtom = atom((get) => {
     const basket = get(basketAtom);
+    // @ts-ignore
     return basket.reduce((total, item) => total + item.quantity, 0);
 });
 

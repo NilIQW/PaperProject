@@ -1,5 +1,5 @@
 import { atom } from 'jotai';
-import { Paper } from '../../models/Paper.tsx';
+import { Paper } from '../models/Paper.tsx';
 
 export const paperAtom = atom<Paper>({
     id: 0,

@@ -1,11 +1,9 @@
 // src/atoms/customerAtom.ts
 import { atom } from 'jotai';
-import { Customer } from '../../models/Customer';
-import { getCustomers } from "../../services/customerService";
+import { Customer } from '../models/Customer.tsx';
+import { getCustomers } from "../services/customerService.tsx";
 
-// Atom to store the list of customers
 export const customerAtom = atom<Customer[]>([]);
-
 
 export const nameAtom = atom('');
 export const emailAtom = atom('');

@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 using PaperAPI.Models;
 using PaperAPI.Repositories;
 
-public class Program // Explicitly declare this class as public
+public class Program 
 {
     public static void Main(string[] args)
     {
@@ -14,11 +14,11 @@ public class Program // Explicitly declare this class as public
         builder.Services.AddCors(options =>
         {
             options.AddPolicy("AllowAll",
-                builder =>
+                policyBuilder =>
                 {
-                    builder.AllowAnyOrigin() // Allow any origin
-                        .AllowAnyMethod() // Allow any HTTP method
-                        .AllowAnyHeader(); // Allow any header
+                    policyBuilder.AllowAnyOrigin() 
+                                 .AllowAnyMethod()
+                                 .AllowAnyHeader();
                 });
         });
 
@@ -26,22 +26,19 @@ public class Program // Explicitly declare this class as public
             options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
         builder.Services.AddScoped<IRepository<Customer>, CustomerRepository>();
-        builder.Services.AddScoped<IRepository<Paper>, PaperRepository>();
+        builder.Services.AddScoped<IPaperRepository, PaperRepository>();
         builder.Services.AddScoped<IOrderRepository, OrderRepository>();
         builder.Services.AddScoped<PaperPropertyRepository>();
         builder.Services.AddScoped<IPropertyRepository, PropertyRepository>(); 
         builder.Services.AddScoped<IRepository<OrderEntry>, OrderEntryRepository>();
 
-        
+        // Configure JSON options to handle circular references
         builder.Services.AddControllers()
             .AddJsonOptions(options =>
             {
-                options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
             });
 
-
-        builder.Services.AddControllers(); 
-        
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
 
@@ -55,7 +52,7 @@ public class Program // Explicitly declare this class as public
         {
             app.UseDeveloperExceptionPage();
             app.UseSwagger();
-            app.UseSwaggerUI(c => 
+            app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "PaperAPI v1");
                 c.RoutePrefix = string.Empty;

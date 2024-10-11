@@ -1,7 +1,7 @@
 // src/components/AddToBasketButton.tsx
 import React from 'react';
 import { useAtom } from 'jotai';
-import { basketAtom } from '../state/atoms/basketAtom';
+import { basketAtom } from '../atoms/basketAtom';
 import { Paper } from '../models/Paper';
 
 interface AddToBasketButtonProps {
