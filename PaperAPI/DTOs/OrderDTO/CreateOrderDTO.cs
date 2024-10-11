@@ -16,7 +16,7 @@ public class OrderEntryDTO
     public int Id { get; set; }
     public int Quantity { get; set; }
     public int? ProductId { get; set; }
-    public int? OrderId { get; set; } // Optional, depending on use case
+    public int? OrderId { get; set; }
 }
 
 public class CreateOrderEntryDTO

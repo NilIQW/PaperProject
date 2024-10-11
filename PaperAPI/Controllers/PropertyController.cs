@@ -1,4 +1,3 @@
-// PaperAPI/Controllers/PropertiesController.cs
 using Microsoft.AspNetCore.Mvc;
 using PaperAPI.DTOs;
 using PaperAPI.DTOs.PropertyDTO;
@@ -11,30 +10,38 @@ namespace PaperAPI.Controllers
     [ApiController]
     public class PropertyController : ControllerBase
     {
-        private readonly IRepository<Property> _propertyRepository;
+        private readonly IPropertyRepository _propertyRepository;
 
-        public PropertyController(IRepository<Property> propertyRepository)
+        public PropertyController(IPropertyRepository propertyRepository)
         {
             _propertyRepository = propertyRepository;
         }
 
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<PropertyDTO>>> GetProperties()
+        {
+            var properties = await _propertyRepository.GetAllAsync();
+            var propertyDtoList = properties.Select(p => new PropertyDTO
+            {
+                Id = p.Id,
+                PropertyName = p.PropertyName
+            }).ToList();
+            
+            return Ok(propertyDtoList);
+        }
+
         [HttpPost]
-        public async Task<ActionResult<PropertyDTO>> PostProperty(CreatePropertyDTO createPropertyDto)
+        public async Task<ActionResult<PropertyDTO>> CreateProperty(PropertyDTO propertyDto)
         {
             var property = new Property
             {
-                PropertyName = createPropertyDto.PropertyName,
+                PropertyName = propertyDto.PropertyName
             };
-
+            
             await _propertyRepository.AddAsync(property);
-
-            var propertyDto = new PropertyDTO
-            {
-                Id = property.Id,
-                PropertyName = property.PropertyName,
-            };
-
-            return CreatedAtAction(nameof(PostProperty), new { id = property.Id }, propertyDto);
+            
+            propertyDto.Id = property.Id; // Get the Id of the created property
+            return CreatedAtAction(nameof(GetProperties), new { id = propertyDto.Id }, propertyDto);
         }
     }
 }

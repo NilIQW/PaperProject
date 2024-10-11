@@ -29,6 +29,7 @@ const OrderHistory: React.FC = () => {
     useEffect(() => {
         const results = orders.filter(order => {
             const customerName = order.customer?.name.toLowerCase() || '';
+            // @ts-ignore
             const customerEmail = order.customer?.email.toLowerCase() || '';
             return (
                 customerName.includes(searchTerm.toLowerCase()) ||
@@ -50,18 +51,14 @@ const OrderHistory: React.FC = () => {
                 deliveryDate
             };
 
-            try {
                 await updateOrderStatus(updatedOrder);
-                setOrders(prevOrders =>
-                    prevOrders.map(order =>
-                        order.id === updatedOrder.id ? updatedOrder : order
-                    )
-                );
+                const existingOrderIndex = orders.findIndex(order => order.id === updatedOrder.id);
+                const duplicate = [...orders];
+                duplicate[existingOrderIndex] = updatedOrder;
+                setOrders(duplicate);
                 setSelectedOrder(null); // Close the details view
                 setDeliveryDate(''); // Reset delivery date
-            } catch (error) {
-                console.error("Error updating order status:", error);
-            }
+
         }
     };
 

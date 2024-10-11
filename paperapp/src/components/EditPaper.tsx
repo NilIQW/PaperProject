@@ -7,6 +7,7 @@ import { customPropertiesAtom } from '../state/atoms/CustomPropertiesAtom';
 import { Property } from '../models/Property';
 import { fetchPaperById } from '../services/paperService';
 
+
 const EditPaper: React.FC = () => {
     const [paper, setPaper] = useAtom(paperAtom);
     const [customProperties, setCustomProperties] = useAtom(customPropertiesAtom);
@@ -32,17 +33,35 @@ const EditPaper: React.FC = () => {
         e.preventDefault();
 
         try {
+            // Correct the API method for updating the paper
             const updatedPaper = await updatePaper(paper.id, {
+                id: paper.id, orderEntries: [],
                 name: paper.name,
                 discontinued: paper.discontinued,
                 stock: paper.stock,
                 price: paper.price,
                 imageUrl: imageFile ? URL.createObjectURL(imageFile) : paper.imageUrl,
                 sheetsPerPacket: paper.sheetsPerPacket,
-                properties: customProperties.map((prop) => ({
-                    id: prop.id,
-                    propertyName: prop.propertyName,
-                })),
+                // Map customProperties to PaperProperty structure
+                Properties: customProperties.map((customProp) => ({
+                    paperId: paper.id, // Set the paperId
+                    propertyId: customProp.id, // The propertyId is the id of Property
+                    paper: {
+                        id: paper.id,
+                        name: paper.name,
+                        discontinued: paper.discontinued,
+                        stock: paper.stock,
+                        price: paper.price,
+                        imageUrl: paper.imageUrl,
+                        sheetsPerPacket: paper.sheetsPerPacket,
+                        orderEntries: paper.orderEntries, // Keep the original structure
+                    },
+                    property: {
+                        id: customProp.id,  // Assuming id is used for Property
+                        propertyName: customProp.propertyName,
+                        paperProperties: [] // You can pass an empty array or relevant data here if needed
+                    },
+                }))
             });
 
             console.log('Paper updated:', updatedPaper);
@@ -51,6 +70,8 @@ const EditPaper: React.FC = () => {
             console.error('Error updating paper:', err);
         }
     };
+
+
 
     const handlePropertyChange = (index: number, value: string) => {
         const newProperties = [...customProperties];

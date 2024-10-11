@@ -45,7 +45,7 @@ export const updateOrderStatus = async (order: Order) => {
     if (!response.ok) {
         throw new Error("Unable to update order status");
     }
-    return await response.json();
+
 };
 
 

@@ -12,25 +12,28 @@ const CreatePaper: React.FC = () => {
     const [imageFile, setImageFile] = useState<File | null>(null);
     const navigate = useNavigate();
 
+    // Handle form submission
     const handleCreate = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        try {
-            const response = await createPaper({
-                name: paper.name,
-                discontinued: paper.discontinued,
-                stock: paper.stock,
-                price: paper.price,
-                imageUrl: imageFile ? URL.createObjectURL(imageFile) : paper.imageUrl,
-                sheetsPerPacket: paper.sheetsPerPacket,
-                paperProperties: customProperties.map((prop) => ({
-                    paperId: paper.id,
-                    propertyId: prop.id,
-                    propertyName: prop.propertyName,
-                })),
-                orderEntries: [] // Pass an empty array if not used
-            });
+        // Construct the payload for paper creation
+        const paperPayload = {
+            name: paper.name,
+            discontinued: paper.discontinued,
+            stock: paper.stock,
+            price: paper.price,
+            imageUrl: imageFile ? URL.createObjectURL(imageFile) : paper.imageUrl,
+            sheetsPerPacket: paper.sheetsPerPacket,
+            paperProperties: customProperties.map((prop) => ({
+                propertyName: prop.propertyName, // Backend expects propertyName
+            })),
+        };
 
+        try {
+            // Send the create paper request to the API
+            const response = await createPaper(paperPayload);
+
+            // If creation is successful, navigate to the main page
             if (response) {
                 navigate('/');
             }
@@ -39,27 +42,30 @@ const CreatePaper: React.FC = () => {
         }
     };
 
+    // Handle changes to individual custom properties
     const handlePropertyChange = (index: number, value: string) => {
         const newProperties = [...customProperties];
         newProperties[index] = { ...newProperties[index], propertyName: value };
         setCustomProperties(newProperties);
     };
 
+    // Add a new custom property
     const addCustomProperty = () => {
         const newProperty: Property = {
-            id: Date.now(),
+            id: Date.now(), // Temporary unique ID for UI purposes
             propertyName: '',
-            paperProperties: []
+            paperProperties: [],
         };
         setCustomProperties([...customProperties, newProperty]);
     };
 
-
+    // Remove a custom property
     const removeCustomProperty = (index: number) => {
         const newProperties = customProperties.filter((_, i) => i !== index);
         setCustomProperties(newProperties);
     };
 
+    // Handle image file change
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {

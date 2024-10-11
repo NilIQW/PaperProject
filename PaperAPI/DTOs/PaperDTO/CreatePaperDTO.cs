@@ -9,7 +9,7 @@ public class CreatePaperDTO
     public string ImageUrl { get; set; } = String.Empty;
     public int SheetsPerPacket { get; set; }
     
-    public List<PropertyDTO.PropertyDTO>? Properties { get; set; } = new List<PropertyDTO.PropertyDTO>();
+    public List<PaperPropertyDTO.PaperPropertyDTO>? PaperProperties { get; set; } = new List<PaperPropertyDTO.PaperPropertyDTO>();
 
 
 }

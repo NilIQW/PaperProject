@@ -18,7 +18,6 @@ public class OrdersController : ControllerBase
         _orderEntryRepository = orderEntryRepository;
     }
 
-    // Get all orders
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Order>>> GetAllOrders()
     {
@@ -66,9 +65,8 @@ public class OrdersController : ControllerBase
 
         try
         {
-            await _orderRepository.AddAsync(order); // Add the order first
+            await _orderRepository.AddAsync(order); 
 
-            // Now order.Id should be populated after SaveChangesAsync in AddAsync
             foreach (var entry in createOrderDto.OrderEntries)
             {
                 if (entry.Quantity <= 0)
@@ -78,7 +76,7 @@ public class OrdersController : ControllerBase
 
                 var orderEntry = new OrderEntry
                 {
-                    OrderId = order.Id, // Ensure the order ID is set correctly
+                    OrderId = order.Id, 
                     ProductId = entry.ProductId,
                     Quantity = entry.Quantity
                 };
@@ -139,10 +137,9 @@ public class OrdersController : ControllerBase
         existingOrder.Status = updatedOrder.Status; // Update the status
         existingOrder.DeliveryDate = updatedOrder.DeliveryDate; // Update the delivery date
 
-        // Call the repository to update the order
         await _orderRepository.UpdateAsync(existingOrder);
 
-        return NoContent(); // Return 204 No Content on successful update
+        return NoContent(); 
     }
     
 }

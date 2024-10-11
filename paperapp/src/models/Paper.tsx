@@ -11,5 +11,5 @@ export interface Paper {
     sheetsPerPacket: number;
     imageUrl?: string;
     orderEntries: OrderEntry[];
-    paperProperties?: PaperProperty[];
+    Properties?: PaperProperty[];
 }

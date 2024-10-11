@@ -1,120 +1,108 @@
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Net.Http.Json;
+using System.Text.Json;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using PaperAPI.Models;
 using PaperAPI.Repositories;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using PgCtx;
 using Xunit;
-using Xunit.Abstractions;
 
-namespace PaperRepositoryTests
+namespace PaperAPI.xUnitTests.Tests
 {
     public class PaperRepositoryTests : WebApplicationFactory<Program>
     {
         private readonly PgCtxSetup<PaperDbContext> _pgCtxSetup;
-        private readonly ITestOutputHelper _outputHelper;
 
-        public PaperRepositoryTests(ITestOutputHelper outputHelper)
+        public PaperRepositoryTests()
         {
-            _outputHelper = outputHelper;
-            _pgCtxSetup = new PgCtxSetup<PaperDbContext>(); // Initialize your PgCtxSetup here
-            Environment.SetEnvironmentVariable("DbConnectionString", _pgCtxSetup._postgres.GetConnectionString());
+            _pgCtxSetup = new PgCtxSetup<PaperDbContext>();
         }
 
         [Fact]
         public async Task GetAllAsync_ReturnsAllPapers()
         {
             // Arrange
-            var paperRepo = new PaperRepository(_pgCtxSetup.DbContextInstance);
-            await SeedPapersAsync(5); // Seed some test data
+            var repository = new PaperRepository(_pgCtxSetup.DbContextInstance);
+            for (var i = 0; i < 5; i++)
+            {
+                var paper = TestObjects.GetPaper();
+                await repository.AddAsync(paper);
+            }
 
             // Act
-            var papers = await paperRepo.GetAllAsync();
+            var papers = await repository.GetAllAsync();
 
             // Assert
             Assert.Equal(5, papers.Count());
         }
 
         [Fact]
-        public async Task GetByIdAsync_ReturnsPaper_WhenExists()
+        public async Task GetByIdAsync_ReturnsCorrectPaper()
         {
             // Arrange
-            var paperRepo = new PaperRepository(_pgCtxSetup.DbContextInstance);
-            var paper = new Paper { Name = "Test Paper", Price = 10.0M, Stock = 100 };
-            await paperRepo.AddAsync(paper);
+            var repository = new PaperRepository(_pgCtxSetup.DbContextInstance);
+            var paper = TestObjects.GetPaper();
+            await repository.AddAsync(paper);
 
             // Act
-            var fetchedPaper = await paperRepo.GetByIdAsync(paper.Id);
+            var result = await repository.GetByIdAsync(paper.Id);
 
             // Assert
-            Assert.NotNull(fetchedPaper);
-            Assert.Equal(paper.Name, fetchedPaper.Name);
+            Assert.NotNull(result);
+            Assert.Equal(paper.Name, result.Name);
         }
 
         [Fact]
-        public async Task AddAsync_AddsPaper()
+        public async Task AddAsync_CreatesNewPaper()
         {
             // Arrange
-            var paperRepo = new PaperRepository(_pgCtxSetup.DbContextInstance);
-            var newPaper = new Paper { Name = "New Paper", Price = 20.0M, Stock = 50 };
+            var repository = new PaperRepository(_pgCtxSetup.DbContextInstance);
+            var paper = TestObjects.GetPaper();
 
             // Act
-            await paperRepo.AddAsync(newPaper);
-            var fetchedPaper = await paperRepo.GetByIdAsync(newPaper.Id);
+            await repository.AddAsync(paper);
+            var result = await repository.GetByIdAsync(paper.Id);
 
             // Assert
-            Assert.NotNull(fetchedPaper);
-            Assert.Equal(newPaper.Name, fetchedPaper.Name);
+            Assert.NotNull(result);
+            Assert.Equal(paper.Name, result.Name);
         }
 
         [Fact]
-        public async Task UpdateAsync_UpdatesPaper()
+        public async Task UpdateAsync_UpdatesExistingPaper()
         {
             // Arrange
-            var paperRepo = new PaperRepository(_pgCtxSetup.DbContextInstance);
-            var paper = new Paper { Name = "Old Paper", Price = 15.0M, Stock = 30 };
-            await paperRepo.AddAsync(paper);
-            paper.Name = "Updated Paper"; // Change the name for update
+            var repository = new PaperRepository(_pgCtxSetup.DbContextInstance);
+            var paper = TestObjects.GetPaper();
+            await repository.AddAsync(paper);
 
+            paper.Name = "Updated Paper Name";
             // Act
-            await paperRepo.UpdateAsync(paper);
-            var updatedPaper = await paperRepo.GetByIdAsync(paper.Id);
+            await repository.UpdateAsync(paper);
+            var updatedPaper = await repository.GetByIdAsync(paper.Id);
 
             // Assert
             Assert.NotNull(updatedPaper);
-            Assert.Equal("Updated Paper", updatedPaper.Name);
+            Assert.Equal("Updated Paper Name", updatedPaper.Name);
         }
 
         [Fact]
-        public async Task DeleteAsync_RemovesPaper_WhenExists()
+        public async Task DeleteAsync_RemovesPaper()
         {
             // Arrange
-            var paperRepo = new PaperRepository(_pgCtxSetup.DbContextInstance);
-            var paper = new Paper { Name = "Paper to Delete", Price = 25.0M, Stock = 60 };
-            await paperRepo.AddAsync(paper);
+            var repository = new PaperRepository(_pgCtxSetup.DbContextInstance);
+            var paper = TestObjects.GetPaper();
+            await repository.AddAsync(paper);
 
             // Act
-            await paperRepo.DeleteAsync(paper.Id);
-            var deletedPaper = await paperRepo.GetByIdAsync(paper.Id);
+            await repository.DeleteAsync(paper.Id);
+            var result = await repository.GetByIdAsync(paper.Id);
 
             // Assert
-            Assert.Null(deletedPaper); // Should be null after deletion
-        }
-
-        private async Task SeedPapersAsync(int count)
-        {
-            for (int i = 0; i < count; i++)
-            {
-                var paper = new Paper
-                {
-                    Name = $"Paper {i + 1}",
-                    Price = 10.0M + i,
-                    Stock = 100 + i
-                };
-                await _pgCtxSetup.DbContextInstance.Papers.AddAsync(paper);
-            }
-            await _pgCtxSetup.DbContextInstance.SaveChangesAsync();
+            Assert.Null(result);
         }
     }
 }

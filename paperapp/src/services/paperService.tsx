@@ -35,12 +35,13 @@ export const createPaper = async (paperData: any) => {
     });
 
     if (!response.ok) {
-        const errorMessage = await response.text();
-        throw new Error(`Failed to create paper: ${errorMessage}`);
+        const errorData = await response.json();
+        throw new Error(`Failed to create paper: ${JSON.stringify(errorData)}`);
     }
 
-    return response.json(); // Parse the JSON response if the request was successful
+    return await response.json();
 };
+
 
 
 export const updatePaper = async (id: number, paperData: Paper) => {
