@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "VpiyubBquJk=",
+  "dgSpecHash": "LRtWi+6ZetI=",
   "success": true,
   "projectFilePath": "/Users/niltwi/Documents/PaperAPI/PaperAPI.xUnitTests/PaperAPI.xUnitTests.csproj",
   "expectedPackageFiles": [
@@ -84,7 +84,7 @@
     "/Users/niltwi/.nuget/packages/xunit.core/2.9.2/xunit.core.2.9.2.nupkg.sha512",
     "/Users/niltwi/.nuget/packages/xunit.extensibility.core/2.9.2/xunit.extensibility.core.2.9.2.nupkg.sha512",
     "/Users/niltwi/.nuget/packages/xunit.extensibility.execution/2.9.2/xunit.extensibility.execution.2.9.2.nupkg.sha512",
-    "/Users/niltwi/.nuget/packages/xunit.runner.visualstudio/3.0.0-pre.35/xunit.runner.visualstudio.3.0.0-pre.35.nupkg.sha512"
+    "/Users/niltwi/.nuget/packages/xunit.runner.visualstudio/2.4.5/xunit.runner.visualstudio.2.4.5.nupkg.sha512"
   ],
   "logs": []
 }

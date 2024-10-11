@@ -13,9 +13,7 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8'
-      - run: dotnet restore 
-      - name: Install test SDK dependencies
-        run: dotnet tool install --global dotnet-suggest
-      - name: Install .NET Test SDK
-        run: dotnet add package Microsoft.NET.Test.Sdk --version 17.11.1
-      - run: dotnet test --verbosity detailed
+      - run: dotnet clean PaperAPI.xUnitTests/PaperAPI.xUnitTests.csproj
+      - run: dotnet restore PaperAPI.xUnitTests/PaperAPI.xUnitTests.csproj
+      - run: dotnet add PaperAPI.xUnitTests/PaperAPI.xUnitTests.csproj package Microsoft.NET.Test.Sdk --version 17.11.1
+      - run: dotnet test PaperAPI.xUnitTests/PaperAPI.xUnitTests.csproj --logger:console;verbosity=detailed
