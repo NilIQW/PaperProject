@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("PaperAPI.xUnitTests")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f010c5703e2ae20c8b952d20278c8b7a9133bebe")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4e93e90c42dda81672a93993d7e9e766a8c07f77")]
 [assembly: System.Reflection.AssemblyProductAttribute("PaperAPI.xUnitTests")]
 [assembly: System.Reflection.AssemblyTitleAttribute("PaperAPI.xUnitTests")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
