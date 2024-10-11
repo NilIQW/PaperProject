@@ -96,13 +96,19 @@ namespace PaperAPI.xUnitTests.Tests
             var repository = new PaperRepository(_pgCtxSetup.DbContextInstance);
             var paper = TestObjects.GetPaper();
             await repository.AddAsync(paper);
+            await _pgCtxSetup.DbContextInstance.SaveChangesAsync(); // Ensure the paper is added to the database
+    
+            // Detach the paper to avoid tracking conflicts
+            _pgCtxSetup.DbContextInstance.Entry(paper).State = EntityState.Detached;
 
             // Act
-            await repository.DeleteAsync(paper.Id);
+            await repository.DeleteAsync(paper.Id); // Now delete it using the proper method
             var result = await repository.GetByIdAsync(paper.Id);
 
             // Assert
-            Assert.Null(result);
+            Assert.Null(result); // Paper should no longer exist
         }
+
+
     }
 }
