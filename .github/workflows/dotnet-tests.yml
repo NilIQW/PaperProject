@@ -13,7 +13,7 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8'
-      - run: dotnet clean PaperAPI.xUnitTests/PaperAPI.xUnitTests.csproj
       - run: dotnet restore PaperAPI.xUnitTests/PaperAPI.xUnitTests.csproj
+      - run: dotnet clean PaperAPI.xUnitTests/PaperAPI.xUnitTests.csproj
       - run: dotnet add PaperAPI.xUnitTests/PaperAPI.xUnitTests.csproj package Microsoft.NET.Test.Sdk --version 17.11.1
       - run: dotnet test PaperAPI.xUnitTests/PaperAPI.xUnitTests.csproj --logger:console;verbosity=detailed
